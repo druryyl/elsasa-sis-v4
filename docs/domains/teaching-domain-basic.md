@@ -4,7 +4,7 @@
 
 The Teaching domain (Basic) is the authoritative source for who the school's teachers are and what they teach. It manages three core responsibilities:
 
-1. **Teacher Profile** — the identity and contact record of each teacher at the school.
+1. **Teacher Profile** — the identity, personal details, and contact record of each teacher at the school.
 2. **Teacher Assignment** — linking a teacher to a specific subject and study group for an academic period.
 3. **Teaching Capability** — recording which subjects each teacher is qualified or able to teach.
 
@@ -19,7 +19,7 @@ Every other domain that references teachers depends on Teaching for teacher iden
 | Term | Definition |
 |---|---|
 | Teacher | A person employed or engaged by the school to deliver instruction. |
-| Teacher Profile | The school's official record of a teacher's identity and contact information. |
+| Teacher Profile | The school's official record of a teacher's identity, personal details, and contact information. |
 | NIP | Nomor Induk Pegawai — a government-issued civil servant identification number, applicable only to PNS teachers. |
 | NIK | Nomor Induk Kependudukan — a national citizen identification number. |
 | Teacher Status | Whether a teacher is currently active or inactive at the school. |
@@ -37,7 +37,7 @@ Every other domain that references teachers depends on Teaching for teacher iden
 
 | Capability | Description |
 |---|---|
-| Maintain Teacher Profiles | Register, update, and deactivate teacher identity and contact records. |
+| Maintain Teacher Profiles | Register, update, and deactivate teacher identity, personal details, and contact records. |
 | Manage Teacher Assignments | Assign teachers to subjects and study groups for each academic period, and remove or replace those assignments. |
 | Record Teaching Capabilities | Record and maintain the list of subjects each teacher is capable of teaching. |
 
@@ -47,7 +47,7 @@ Every other domain that references teachers depends on Teaching for teacher iden
 
 | Actor | Responsibilities |
 |---|---|
-| School Administrator | Creates and maintains teacher profiles. Assigns teachers to subjects and study groups each academic period. Records and updates teaching capabilities. The primary operator of the Teaching domain. |
+| School Administrator | Creates and maintains teacher profiles (identity, personal details, and contact information). Assigns teachers to subjects and study groups each academic period. Records and updates teaching capabilities. The primary operator of the Teaching domain. |
 | Principal (Kepala Sekolah) | Has oversight of teacher assignments and may direct the School Administrator to create, change, or remove assignments. |
 
 ---
@@ -57,7 +57,7 @@ Every other domain that references teachers depends on Teaching for teacher iden
 ### Teacher Profile
 
 - **Purpose:** Represents the school's official record of a teacher.
-- **Responsibility:** Holds the teacher's identity (full name, NIP/NIK), contact information (phone, email), and current status (active/inactive).
+- **Responsibility:** Holds the teacher's identity (full name, NIP/NIK), personal details (nickname, date of birth, gender, address), contact information (phone, email), and current status (active/inactive).
 - **Relationships:** Referenced by Teacher Assignment and Teaching Capability.
 
 ### Teacher Assignment
@@ -90,7 +90,7 @@ Every other domain that references teachers depends on Teaching for teacher iden
 
 - **Consistency Boundary:** A single teacher and all data directly belonging to that teacher.
 - **Owned Entities:** Teacher Profile, Teaching Capabilities (the set of subjects this teacher can teach).
-- **Business Responsibility:** Ensures the teacher's identity, contact information, status, and capability list are consistent. A teacher's capabilities are always managed in the context of that teacher.
+- **Business Responsibility:** Ensures the teacher's identity, personal details, contact information, status, and capability list are consistent. A teacher's capabilities are always managed in the context of that teacher.
 
 ### Teacher Assignment (Aggregate Root)
 
@@ -104,13 +104,14 @@ Every other domain that references teachers depends on Teaching for teacher iden
 
 | ID | Rule |
 |---|---|
-| BR-TCH-001 | A Teacher Profile must have a full name. |
+| BR-TCH-001 | A Teacher Profile must have a full name and a date of birth. |
 | BR-TCH-002 | A Teacher Profile must have at least one contact method: phone or email. |
 | BR-TCH-003 | Only an active teacher may be assigned to a subject and study group. |
 | BR-TCH-004 | A teacher may not be assigned to the same subject in the same study group for the same academic period more than once. |
 | BR-TCH-005 | A teacher may only be assigned to subjects for which the teacher has a recorded Teaching Capability. |
 | BR-TCH-006 | A Teaching Capability entry must not be duplicated — a teacher may not have the same subject listed more than once. |
 | BR-TCH-007 | Deactivating a teacher (setting status to inactive) does not automatically remove existing assignments; assignments for the current or future academic periods must be explicitly reassigned or removed. |
+| BR-TCH-008 | A Teacher Profile must have a gender (male or female). |
 
 ---
 
@@ -173,7 +174,7 @@ Every other domain that references teachers depends on Teaching for teacher iden
 
 ### Register a New Teacher
 
-1. School Administrator provides the teacher's full name, optional NIP/NIK, phone and/or email.
+1. School Administrator provides the teacher's full name, optional NIP/NIK, optional nickname, date of birth, gender, optional address, and phone and/or email.
 2. A new Teacher Profile is created with status **Active**.
 3. Event: **Teacher Registered**.
 
