@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\ElsasaSis.SharedKernel\ElsasaSis.SharedKernel.csproj" />
+  </ItemGroup>
+</Project>

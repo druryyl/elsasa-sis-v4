@@ -1,0 +1,8 @@
+allowBuilds:
+  esbuild: true
+  msw: true
+  vue-demi: true
+onlyBuiltDependencies:
+  - esbuild
+  - msw
+  - vue-demi

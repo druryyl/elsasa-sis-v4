@@ -727,7 +727,7 @@ YourApp.ModuleA/
 
 ### 11.1 Integration Tests
 
-- **Engine:** Testcontainers (real database container per test session).
+- **Engine:** Testcontainers (real database container per test session) **or** local SQL Server / `MSSQLLocalDB` via configurable test connection string when Docker is unavailable on the host.
 - **Isolation:** Respawn resets table data between tests (millisecond-fast).
 - **Scope:** End-to-end HTTP call through Minimal API → handler → domain → repository → database.
 - **Write Slice tests assert two things:**

@@ -1818,8 +1818,8 @@ server {
 ### 18.1 External Dependencies & Integration Contracts
 
 1. **Authentication Identity Provider Contract:**
-   - *Status:* Architecture decision pending.
-   - *Detail:* The system requires a confirmed authentication flow: dedicated Identity Server / Keycloak / Auth0 / ASP.NET Core custom endpoint, or cloud provider (Azure AD, Google Identity). The exact login request payload, token refresh mechanism, and logout flow must be finalized before the auth feature view can be fully implemented. Evaluate whether OpenID Connect (OIDC) with PKCE is the appropriate flow.
+   - *Status:* **Resolved (`CR-STAGE-0` / `GAP-005`).**
+   - *Detail:* Custom JWT + Refresh Token authentication implemented in `ElsasaSis.Modules.Auth` (`POST /api/auth/login`, `POST /api/auth/refresh`, `POST /api/auth/logout`, `GET /api/auth/me`). Short-lived JWT access tokens live strictly in-memory inside Pinia `useAuthStore`; refresh tokens live in an `HttpOnly`, `SameSite=Strict` cookie (same-origin via Vite `/api` proxy in local dev) and are persisted hashed in `auth.refresh_tokens`. JWT claims emit `sub`, `preferred_username`, `name`, `roles`, `permissions`, and optional actor IDs (`teacherId`, `studentId`, `guardianId`).
 
 2. **File Storage & Document Attachment Pipeline:**
    - *Status:* Unresolved design decision.

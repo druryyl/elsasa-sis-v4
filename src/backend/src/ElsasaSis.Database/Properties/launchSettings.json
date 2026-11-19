@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "ElsasaSis.Database": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

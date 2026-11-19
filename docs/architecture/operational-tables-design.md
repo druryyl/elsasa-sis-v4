@@ -46,7 +46,7 @@ Every aggregate and domain object in [operational-domain-basic.md](file:///d:/Pr
    - The Application Layer generates **UUID v7** identifiers prior to persistence. Because UUID v7 is time-ordered, it aligns well with clustered primary keys while keeping entity identity independent of database round-trips.
 3. **Application-Supplied Audit & Lifecycle Columns:**
    - Every table includes `created_at DATETIME2(3) NOT NULL` and `updated_at DATETIME2(3) NOT NULL` (UTC) populated explicitly by the Application Layer on insert and update.
-   - Initial lifecycle statuses (e.g., `'INACTIVE'` on `opr.academic_years`, `'DRAFT'` on `opr.announcements`) are also set by the Application Layer.
+   - Initial lifecycle statuses (e.g., `'INACTIVE'` on `opr.academic_years` and `opr.operational_periods`, `'DRAFT'` on `opr.announcements`) are also set by the Application Layer.
 4. **No Database Foreign Keys:**
    - Both intra-module references (`academic_year_id`, `operational_period_id`, `room_id`) and cross-module references (`subject_id` -> `acd`, `study_group_id` -> `std`, `teacher_id` -> `tch`, `author_id` -> identity/staff) are stored as plain `UNIQUEIDENTIFIER` columns.
    - Referential integrity and deletion rules (e.g., cleaning up or blocking child records) are managed explicitly in the Application Layer.
@@ -103,6 +103,7 @@ erDiagram
         nvarchar name "e.g. Semester 1"
         date start_date
         date end_date
+        varchar status "INACTIVE | ACTIVE"
         datetime2 created_at
         datetime2 updated_at
     }
@@ -215,6 +216,7 @@ Persists **Operational Period** entities owned by an Academic Year (e.g., `Semes
 | `name` | `NVARCHAR(50)` | `NO` | `UQ_operational_periods_year_name` | Non-blank period name (e.g., `Semester 1`) |
 | `start_date` | `DATE` | `NO` | — | Validate within parent year bounds (`BR-OPS-003`) & non-overlapping (`BR-OPS-004`) |
 | `end_date` | `DATE` | `NO` | — | Validate `end_date > start_date` (`BR-OPS-006`), within parent bounds (`BR-OPS-003`), & non-overlapping (`BR-OPS-004`) |
+| `status` | `VARCHAR(20)` | `NO` | — | Set initial `'INACTIVE'`; enforce `'INACTIVE'` / `'ACTIVE'` and at most one system-wide `ACTIVE` period (only inside the `ACTIVE` Academic Year) |
 | `created_at` | `DATETIME2(3)` | `NO` | — | Populate UTC timestamp on create |
 | `updated_at` | `DATETIME2(3)` | `NO` | — | Populate UTC timestamp on create & update |
 
@@ -222,6 +224,7 @@ Persists **Operational Period** entities owned by an Academic Year (e.g., `Semes
 - `PK_operational_periods`: `PRIMARY KEY CLUSTERED (id)`
 - `UQ_operational_periods_year_name`: `UNIQUE (academic_year_id, name)`
 - `IX_operational_periods_year_dates`: `NONCLUSTERED INDEX (academic_year_id, start_date, end_date)` (supports period lookup by year and date)
+- `IX_operational_periods_status`: `NONCLUSTERED INDEX (status)` (supports resolving the active Operational Period)
 
 ---
 

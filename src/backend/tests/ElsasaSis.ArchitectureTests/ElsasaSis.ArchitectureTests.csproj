@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageReference Include="NetArchTest.Rules" Version="1.3.2" />
+    <PackageReference Include="xunit" Version="2.9.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\ElsasaSis.SharedKernel\ElsasaSis.SharedKernel.csproj" />
+    <ProjectReference Include="..\..\src\ElsasaSis.Contracts\ElsasaSis.Contracts.csproj" />
+    <ProjectReference Include="..\..\src\Modules\ElsasaSis.Modules.Auth\ElsasaSis.Modules.Auth.csproj" />
+    <ProjectReference Include="..\..\src\Modules\ElsasaSis.Modules.Opr\ElsasaSis.Modules.Opr.csproj" />
+    <ProjectReference Include="..\..\src\ElsasaSis.Api\ElsasaSis.Api.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+</Project>

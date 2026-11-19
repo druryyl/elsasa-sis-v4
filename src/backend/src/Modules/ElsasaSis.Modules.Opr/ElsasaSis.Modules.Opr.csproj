@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.1.35" />
+    <PackageReference Include="FluentValidation" Version="11.11.0" />
+    <PackageReference Include="MediatR" Version="12.4.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\ElsasaSis.SharedKernel\ElsasaSis.SharedKernel.csproj" />
+    <ProjectReference Include="..\..\ElsasaSis.Contracts\ElsasaSis.Contracts.csproj" />
+  </ItemGroup>
+</Project>
