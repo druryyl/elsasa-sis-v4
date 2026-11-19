@@ -7,6 +7,7 @@ import Aura from '@primeuix/themes/aura';
 import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
 import { configureHttpClient } from '@/shared/services/http';
+import { configureAuthSessionReader } from '@/shared/services/authSession';
 import type { AcademicYearDto } from '../../api/academicYears.api';
 import CalendarWorkspaceView from '../CalendarWorkspaceView.vue';
 
@@ -95,13 +96,23 @@ function mountCalendarView() {
   });
 }
 
+class MockResizeObserver {
+  observe(): void {}
+  unobserve(): void {}
+  disconnect(): void {}
+}
+
 beforeAll(() => {
+  if (typeof globalThis.ResizeObserver === 'undefined') {
+    globalThis.ResizeObserver = MockResizeObserver as unknown as typeof ResizeObserver;
+  }
   server.listen({ onUnhandledRequest: 'error' });
 });
 
 afterEach(() => {
   server.resetHandlers();
   configureHttpClient(null);
+  configureAuthSessionReader(null);
 });
 
 afterAll(() => {
@@ -331,5 +342,122 @@ describe('CalendarWorkspaceView.vue (SCR-OPR-CALENDAR Part 1)', () => {
     await vi.waitFor(() => {
       expect(periodActivated).toBe(true);
     });
+  });
+
+  it('renders all 3 tabs and supports switching between them', async () => {
+    const years = createSampleYears();
+    server.use(
+      http.get('/api/opr/academic-years', () =>
+        HttpResponse.json({
+          items: years,
+          page: 1,
+          pageSize: 10,
+          totalCount: 2,
+          totalPages: 1
+        })
+      ),
+      http.get('/api/opr/calendar-entries', () =>
+        HttpResponse.json({
+          items: [
+            {
+              id: '01900000-0000-7000-8000-000000000301',
+              academicYearId: YEAR_ACTIVE_ID,
+              entryDate: '2025-08-17',
+              dayType: 'HOLIDAY',
+              description: 'Independence Day'
+            }
+          ],
+          page: 1,
+          pageSize: 10,
+          totalCount: 1,
+          totalPages: 1
+        })
+      ),
+      http.get('/api/opr/rooms', () =>
+        HttpResponse.json({
+          items: [
+            {
+              id: '01900000-0000-7000-8000-000000000401',
+              name: 'Classroom 7A',
+              roomType: 'CLASSROOM',
+              capacity: 32
+            }
+          ],
+          page: 1,
+          pageSize: 10,
+          totalCount: 1,
+          totalPages: 1
+        })
+      )
+    );
+
+    const wrapper = mountCalendarView();
+
+    // Verify all 3 tab buttons are present
+    expect(wrapper.find('[data-testid="tab-academic-cycle"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="tab-calendar-holidays"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="tab-rooms-facilities"]').exists()).toBe(true);
+
+    // Initial tab is Academic Cycle
+    await vi.waitFor(() => {
+      expect(wrapper.text()).toContain('2025/2026');
+    });
+
+    // Switch to Calendar & Holidays Tab
+    await wrapper.find('[data-testid="tab-calendar-holidays"]').trigger('click');
+    await vi.waitFor(() => {
+      expect(wrapper.find('[data-testid="calendar-entries-tab"]').exists()).toBe(true);
+      expect(wrapper.text()).toContain('Independence Day');
+    });
+
+    // Switch to Rooms & Facilities Tab
+    await wrapper.find('[data-testid="tab-rooms-facilities"]').trigger('click');
+    await vi.waitFor(() => {
+      expect(wrapper.find('[data-testid="rooms-tab"]').exists()).toBe(true);
+      expect(wrapper.text()).toContain('Classroom 7A');
+    });
+  });
+
+  it('enforces clean read-only view for Principal/Teacher without manage permissions', async () => {
+    const years = createSampleYears();
+    server.use(
+      http.get('/api/opr/academic-years', () =>
+        HttpResponse.json({
+          items: years,
+          page: 1,
+          pageSize: 10,
+          totalCount: 2,
+          totalPages: 1
+        })
+      )
+    );
+
+    // Principal with only View permissions
+    configureAuthSessionReader({
+      getUser: () => ({
+        id: 'user-principal-id',
+        username: 'principal',
+        displayName: 'Principal Dewi',
+        roles: ['PRINCIPAL'],
+        permissions: [
+          'Permissions.Operations.Calendar.View',
+          'Permissions.Operations.Rooms.View'
+        ]
+      })
+    });
+
+    const wrapper = mountCalendarView();
+
+    // Verify records are visible
+    await vi.waitFor(() => {
+      expect(wrapper.text()).toContain('2025/2026');
+      expect(wrapper.text()).toContain('2026/2027');
+    });
+
+    // Verify management action buttons are hidden
+    expect(wrapper.find('[data-testid="create-academic-year-button"]').exists()).toBe(false);
+    expect(wrapper.find(`[data-testid="edit-year-${YEAR_ACTIVE_ID}"]`).exists()).toBe(false);
+    expect(wrapper.find(`[data-testid="activate-year-${YEAR_INACTIVE_ID}"]`).exists()).toBe(false);
+    expect(wrapper.find(`[data-testid="activate-period-${PERIOD_1_ID}"]`).exists()).toBe(false);
   });
 });

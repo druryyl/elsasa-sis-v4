@@ -1,19 +1,25 @@
 using System.Text;
 using ElsasaSis.Api.Extensions;
+using ElsasaSis.Api.Features.Academic.GetSubjects;
 using ElsasaSis.Api.Infrastructure;
 using ElsasaSis.Api.Middleware;
 using ElsasaSis.Api.Security;
+using ElsasaSis.Contracts.Academic;
 using ElsasaSis.Database;
 using ElsasaSis.Modules.Auth;
 using ElsasaSis.Modules.Auth.Infrastructure;
 using ElsasaSis.Modules.Opr;
+using ElsasaSis.Modules.Std;
+using ElsasaSis.Modules.Tch;
 using ElsasaSis.SharedKernel.Events;
 using ElsasaSis.SharedKernel.Persistence;
 using ElsasaSis.SharedKernel.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using AuthPolicies = ElsasaSis.Modules.Auth.Policies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,10 +41,17 @@ builder.Services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
 builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssemblies(
         typeof(AuthAssemblyMarker).Assembly,
-        typeof(OprAssemblyMarker).Assembly));
+        typeof(OprAssemblyMarker).Assembly,
+        typeof(StdAssemblyMarker).Assembly,
+        typeof(TchAssemblyMarker).Assembly));
 
 builder.Services.AddAuthModule(builder.Configuration);
 builder.Services.AddOprModule();
+builder.Services.AddStdModule();
+builder.Services.AddTchModule();
+
+builder.Services.AddScoped<IAcademicContract, AcademicContract>();
+builder.Services.AddScoped<GetSubjectsHandler>();
 
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
     ?? ["http://localhost:5173"];
@@ -82,8 +95,49 @@ builder.Services.AddAuthorization(options =>
     foreach (var permission in ElsasaSis.Modules.Auth.Permissions.All)
     {
         options.AddPolicy(permission, policy =>
-            policy.RequireClaim("permissions", permission));
+            policy.RequireAssertion(ctx =>
+                ctx.User.Claims
+                    .Where(c => c.Type == "permissions")
+                    .Any(c => string.Equals(c.Value, permission, StringComparison.Ordinal))));
     }
+
+    static bool HasAnyPermission(AuthorizationHandlerContext ctx, params string[] permissions) =>
+        ctx.User.Claims
+            .Where(c => c.Type == "permissions")
+            .Any(c => permissions.Contains(c.Value, StringComparer.Ordinal));
+
+    options.AddPolicy(AuthPolicies.Students.Admissions.DecideOrApprove, policy =>
+        policy.RequireAssertion(ctx => HasAnyPermission(ctx,
+            ElsasaSis.Modules.Auth.Permissions.Students.Admissions.Decide,
+            ElsasaSis.Modules.Auth.Permissions.Students.Admissions.Approve)));
+
+    options.AddPolicy(AuthPolicies.Students.DirectoryOrOwnRoster, policy =>
+        policy.RequireAssertion(ctx => HasAnyPermission(ctx,
+            ElsasaSis.Modules.Auth.Permissions.Students.Directory.View,
+            ElsasaSis.Modules.Auth.Permissions.Students.Directory.Manage,
+            ElsasaSis.Modules.Auth.Permissions.Students.Roster.ViewOwn)));
+
+    options.AddPolicy(AuthPolicies.Operations.Calendar.ViewOrManage, policy =>
+        policy.RequireAssertion(ctx => HasAnyPermission(ctx,
+            ElsasaSis.Modules.Auth.Permissions.Operations.Calendar.View,
+            ElsasaSis.Modules.Auth.Permissions.Operations.Calendar.Manage)));
+
+    options.AddPolicy(AuthPolicies.Operations.Rooms.ViewOrManage, policy =>
+        policy.RequireAssertion(ctx => HasAnyPermission(ctx,
+            ElsasaSis.Modules.Auth.Permissions.Operations.Rooms.View,
+            ElsasaSis.Modules.Auth.Permissions.Operations.Rooms.Manage)));
+
+    options.AddPolicy(AuthPolicies.Operations.Announcements.ViewOrManage, policy =>
+        policy.RequireAssertion(ctx => HasAnyPermission(ctx,
+            ElsasaSis.Modules.Auth.Permissions.Operations.Announcements.View,
+            ElsasaSis.Modules.Auth.Permissions.Operations.Announcements.Create,
+            ElsasaSis.Modules.Auth.Permissions.Operations.Announcements.Publish)));
+
+    options.AddPolicy(AuthPolicies.Teaching.Assignments.ViewOrOversight, policy =>
+        policy.RequireAssertion(ctx => HasAnyPermission(ctx,
+            ElsasaSis.Modules.Auth.Permissions.Teaching.Assignments.View,
+            ElsasaSis.Modules.Auth.Permissions.Teaching.Assignments.Manage,
+            ElsasaSis.Modules.Auth.Permissions.Teaching.Assignments.Oversight)));
 });
 
 builder.Services.AddEndpointsApiExplorer();
@@ -145,7 +199,10 @@ app.MapGet("/health", () => Results.Ok(new { status = "ok" }))
 
 app.MapDiscoveredEndpoints(
     typeof(AuthAssemblyMarker).Assembly,
-    typeof(OprAssemblyMarker).Assembly);
+    typeof(OprAssemblyMarker).Assembly,
+    typeof(StdAssemblyMarker).Assembly,
+    typeof(TchAssemblyMarker).Assembly,
+    typeof(Program).Assembly);
 
 app.Run();
 

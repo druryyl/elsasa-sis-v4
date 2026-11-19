@@ -35,13 +35,13 @@ public abstract class IntegrationTestBase : IAsyncLifetime
         });
     }
 
-    protected async Task<HttpClient> CreateAuthenticatedAdminClientAsync()
+    protected async Task<HttpClient> CreateAuthenticatedClientAsync(string username, string password)
     {
         var client = CreateAnonymousClient(handleCookies: true);
 
         var loginResponse = await client.PostAsJsonAsync(
             "/api/auth/login",
-            new LoginRequest(AdminSeeder.DefaultAdminUsername, IntegrationTestWebApplicationFactory.TestAdminPassword));
+            new LoginRequest(username, password));
 
         loginResponse.EnsureSuccessStatusCode();
 
@@ -52,6 +52,14 @@ public abstract class IntegrationTestBase : IAsyncLifetime
             new AuthenticationHeaderValue("Bearer", payload!.AccessToken);
 
         return client;
+    }
+
+    protected Task<HttpClient> CreateAuthenticatedAdminClientAsync() =>
+        CreateAuthenticatedClientAsync(AdminSeeder.DefaultAdminUsername, IntegrationTestWebApplicationFactory.TestAdminPassword);
+
+    protected async Task SeedStage1FixturesAsync(CancellationToken cancellationToken = default)
+    {
+        await Stage1Seeder.SeedRoleAccountsAndFixturesAsync(Factory.ConnectionString, cancellationToken);
     }
 
     protected static async Task<JsonElement> ReadJsonAsync(HttpResponseMessage response)

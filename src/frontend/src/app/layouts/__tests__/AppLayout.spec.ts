@@ -9,7 +9,7 @@ import Aura from '@primeuix/themes/aura';
 import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
 import { defineComponent } from 'vue';
-import { useAuthStore } from '@/app/stores/auth.store';
+import { useAuthStore, type AuthUser } from '@/app/stores/auth.store';
 import { useAppContextStore } from '@/app/stores/appContext.store';
 import AppLayout from '../AppLayout.vue';
 
@@ -19,27 +19,114 @@ const DummyView = defineComponent({
   template: '<div>Workspace</div>'
 });
 
-async function mountAppLayout() {
+const ROLE_USERS: Record<string, AuthUser> = {
+  SCHOOL_ADMIN: {
+    id: '01900000-0000-7000-8000-000000000001',
+    username: 'admin',
+    displayName: 'School Administrator',
+    email: 'admin@elsasa.sch.id',
+    roles: ['SCHOOL_ADMIN'],
+    permissions: [
+      'Permissions.Operations.Calendar.View',
+      'Permissions.Operations.Calendar.Manage',
+      'Permissions.Operations.Rooms.View',
+      'Permissions.Operations.Rooms.Manage',
+      'Permissions.Operations.Announcements.View',
+      'Permissions.Operations.Announcements.Create',
+      'Permissions.Operations.Announcements.Publish',
+      'Permissions.Students.Admissions.View',
+      'Permissions.Students.Admissions.Register',
+      'Permissions.Students.Admissions.Decide',
+      'Permissions.Students.Admissions.Enroll',
+      'Permissions.Students.Directory.View',
+      'Permissions.Students.Directory.Manage',
+      'Permissions.Students.Placements.Manage',
+      'Permissions.Teaching.Directory.Manage',
+      'Permissions.Teaching.Capabilities.Manage',
+      'Permissions.Teaching.Assignments.View',
+      'Permissions.Teaching.Assignments.Manage',
+      'Permissions.Teaching.Assignments.Oversight'
+    ],
+    teacherId: null,
+    studentId: null,
+    guardianId: null
+  },
+  PRINCIPAL: {
+    id: '01900000-0000-7000-8000-000000000002',
+    username: 'principal',
+    displayName: 'School Principal',
+    email: 'principal@elsasa.sch.id',
+    roles: ['PRINCIPAL'],
+    permissions: [
+      'Permissions.Operations.Calendar.View',
+      'Permissions.Operations.Rooms.View',
+      'Permissions.Operations.Announcements.View',
+      'Permissions.Students.Admissions.View',
+      'Permissions.Students.Admissions.Approve',
+      'Permissions.Students.Directory.View',
+      'Permissions.Teaching.Assignments.View',
+      'Permissions.Teaching.Assignments.Oversight'
+    ],
+    teacherId: null,
+    studentId: null,
+    guardianId: null
+  },
+  TEACHER: {
+    id: '01900000-0000-7000-8000-000000000003',
+    username: 'teacher.andi',
+    displayName: 'Andi Wijaya',
+    email: 'andi@elsasa.sch.id',
+    roles: ['TEACHER'],
+    permissions: [
+      'Permissions.Operations.Calendar.View',
+      'Permissions.Operations.Announcements.View',
+      'Permissions.Teaching.Assignments.View'
+    ],
+    teacherId: '01900000-0000-7000-8000-000000000031',
+    studentId: null,
+    guardianId: null
+  },
+  HOMEROOM_TEACHER: {
+    id: '01900000-0000-7000-8000-000000000004',
+    username: 'homeroom.siti',
+    displayName: 'Siti Aminah',
+    email: 'siti@elsasa.sch.id',
+    roles: ['HOMEROOM_TEACHER'],
+    permissions: [
+      'Permissions.Operations.Calendar.View',
+      'Permissions.Operations.Announcements.View',
+      'Permissions.Students.Roster.ViewOwn'
+    ],
+    teacherId: '01900000-0000-7000-8000-000000000041',
+    studentId: null,
+    guardianId: null
+  },
+  TEACHER_AND_HOMEROOM: {
+    id: '01900000-0000-7000-8000-000000000005',
+    username: 'teacher.budi',
+    displayName: 'Budi Santoso',
+    email: 'budi@elsasa.sch.id',
+    roles: ['TEACHER', 'HOMEROOM_TEACHER'],
+    permissions: [
+      'Permissions.Operations.Calendar.View',
+      'Permissions.Operations.Announcements.View',
+      'Permissions.Teaching.Assignments.View',
+      'Permissions.Students.Roster.ViewOwn'
+    ],
+    teacherId: '01900000-0000-7000-8000-000000000051',
+    studentId: null,
+    guardianId: null
+  }
+};
+
+async function mountAppLayout(user: AuthUser = ROLE_USERS.SCHOOL_ADMIN!) {
   const pinia = createPinia();
   setActivePinia(pinia);
 
   const authStore = useAuthStore(pinia);
   authStore.setSession({
     accessToken: 'jwt-token',
-    user: {
-      id: '01900000-0000-7000-8000-000000000001',
-      username: 'admin',
-      displayName: 'School Administrator',
-      email: 'admin@elsasa.sch.id',
-      roles: ['SCHOOL_ADMIN'],
-      permissions: [
-        'Permissions.Operations.Calendar.View',
-        'Permissions.Operations.Calendar.Manage'
-      ],
-      teacherId: null,
-      studentId: null,
-      guardianId: null
-    }
+    user
   });
 
   const router = createRouter({
@@ -52,6 +139,26 @@ async function mountAppLayout() {
       {
         path: '/operations/calendar',
         name: 'operations.calendar',
+        component: DummyView
+      },
+      {
+        path: '/operations/announcements',
+        name: 'operations.announcements',
+        component: DummyView
+      },
+      {
+        path: '/admissions/queue',
+        name: 'admissions.queue',
+        component: DummyView
+      },
+      {
+        path: '/students/directory',
+        name: 'students.directory',
+        component: DummyView
+      },
+      {
+        path: '/teachers/assignments',
+        name: 'teachers.assignments',
         component: DummyView
       },
       {
@@ -93,6 +200,52 @@ async function mountAppLayout() {
   });
 
   return { wrapper, appContextStore: useAppContextStore(pinia) };
+}
+
+function mockAcademicYearsEndpoint() {
+  const yearActiveId = '01900000-0000-7000-8000-000000000101';
+  const periodActiveId = '01900000-0000-7000-8000-000000000201';
+  const periodInactiveId = '01900000-0000-7000-8000-000000000202';
+
+  server.use(
+    http.get('/api/opr/academic-years', () =>
+      HttpResponse.json({
+        items: [
+          {
+            id: yearActiveId,
+            name: '2025/2026',
+            startDate: '2025-07-01',
+            endDate: '2026-06-30',
+            status: 'ACTIVE',
+            periods: [
+              {
+                id: periodActiveId,
+                academicYearId: yearActiveId,
+                name: 'Semester 1',
+                startDate: '2025-07-01',
+                endDate: '2025-12-20',
+                status: 'ACTIVE'
+              },
+              {
+                id: periodInactiveId,
+                academicYearId: yearActiveId,
+                name: 'Semester 2',
+                startDate: '2026-01-05',
+                endDate: '2026-06-30',
+                status: 'INACTIVE'
+              }
+            ]
+          }
+        ],
+        page: 1,
+        pageSize: 100,
+        totalCount: 1,
+        totalPages: 1
+      })
+    )
+  );
+
+  return { yearActiveId, periodActiveId, periodInactiveId };
 }
 
 beforeAll(() => {
@@ -171,5 +324,124 @@ describe('AppLayout.vue Top Bar Context Switcher', () => {
       expect(appContextStore.isHistoricalPeriod).toBe(true);
       expect(wrapper.find('[data-testid="historical-period-banner"]').exists()).toBe(true);
     });
+  });
+
+  it('populates Top Bar switcher for read-only Operations.Calendar.View users and skips query when lacking calendar permissions', async () => {
+    const { yearActiveId, periodActiveId } = mockAcademicYearsEndpoint();
+
+    const { wrapper: teacherWrapper, appContextStore: teacherContext } = await mountAppLayout(
+      ROLE_USERS.TEACHER
+    );
+
+    await vi.waitFor(() => {
+      expect(teacherContext.activeAcademicYearId).toBe(yearActiveId);
+      expect(teacherContext.activePeriodId).toBe(periodActiveId);
+      expect(teacherWrapper.find('[data-testid="context-switcher-select"]').exists()).toBe(true);
+    });
+
+    server.resetHandlers();
+    const { wrapper: noCalendarWrapper, appContextStore: noCalendarContext } = await mountAppLayout(
+      {
+        ...ROLE_USERS.TEACHER!,
+        permissions: ['Permissions.Teaching.Assignments.View']
+      }
+    );
+
+    expect(noCalendarContext.activeAcademicYearId).toBeNull();
+    expect(noCalendarWrapper.find('[data-testid="context-switcher-select"]').exists()).toBe(false);
+  });
+});
+
+describe('AppLayout.vue Role-Filtered Navigation Taxonomy', () => {
+  function getVisibleNavLabels(wrapper: ReturnType<typeof mount>): string[] {
+    return wrapper.findAll('aside nav a').map((link) => link.text().trim());
+  }
+
+  function getVisibleGroupHeaders(wrapper: ReturnType<typeof mount>): string[] {
+    return wrapper.findAll('aside nav p').map((heading) => heading.text().trim());
+  }
+
+  it('renders all 4 Stage 1 groups and 5 menu items for SCHOOL_ADMIN', async () => {
+    mockAcademicYearsEndpoint();
+    const { wrapper } = await mountAppLayout(ROLE_USERS.SCHOOL_ADMIN);
+
+    expect(getVisibleGroupHeaders(wrapper)).toEqual([
+      'Admissions',
+      'Students & Classes',
+      'Faculty & Teaching',
+      'Operations & Comms'
+    ]);
+    expect(getVisibleNavLabels(wrapper)).toEqual([
+      'Admissions Queue',
+      'Student Directory & Placements',
+      'Teachers & Assignments',
+      'School Calendar & Academic Cycle',
+      'Announcements & Bulletin'
+    ]);
+  });
+
+  it('renders all 4 Stage 1 groups and 5 menu items for PRINCIPAL', async () => {
+    mockAcademicYearsEndpoint();
+    const { wrapper } = await mountAppLayout(ROLE_USERS.PRINCIPAL);
+
+    expect(getVisibleGroupHeaders(wrapper)).toEqual([
+      'Admissions',
+      'Students & Classes',
+      'Faculty & Teaching',
+      'Operations & Comms'
+    ]);
+    expect(getVisibleNavLabels(wrapper)).toEqual([
+      'Admissions Queue',
+      'Student Directory & Placements',
+      'Teachers & Assignments',
+      'School Calendar & Academic Cycle',
+      'Announcements & Bulletin'
+    ]);
+  });
+
+  it('filters sidebar to Faculty & Teaching and Operations & Comms for TEACHER', async () => {
+    mockAcademicYearsEndpoint();
+    const { wrapper } = await mountAppLayout(ROLE_USERS.TEACHER);
+
+    expect(getVisibleGroupHeaders(wrapper)).toEqual(['Faculty & Teaching', 'Operations & Comms']);
+    expect(getVisibleNavLabels(wrapper)).toEqual([
+      'Teachers & Assignments',
+      'School Calendar & Academic Cycle',
+      'Announcements & Bulletin'
+    ]);
+    expect(wrapper.find('[data-testid="nav-item-admissions.queue"]').exists()).toBe(false);
+    expect(wrapper.find('[data-testid="nav-item-students.directory"]').exists()).toBe(false);
+  });
+
+  it('filters sidebar to Students & Classes and Operations & Comms for HOMEROOM_TEACHER', async () => {
+    mockAcademicYearsEndpoint();
+    const { wrapper } = await mountAppLayout(ROLE_USERS.HOMEROOM_TEACHER);
+
+    expect(getVisibleGroupHeaders(wrapper)).toEqual(['Students & Classes', 'Operations & Comms']);
+    expect(getVisibleNavLabels(wrapper)).toEqual([
+      'Student Directory & Placements',
+      'School Calendar & Academic Cycle',
+      'Announcements & Bulletin'
+    ]);
+    expect(wrapper.find('[data-testid="nav-item-admissions.queue"]').exists()).toBe(false);
+    expect(wrapper.find('[data-testid="nav-item-teachers.assignments"]').exists()).toBe(false);
+  });
+
+  it('combines navigation items additively for composable TEACHER + HOMEROOM_TEACHER persona', async () => {
+    mockAcademicYearsEndpoint();
+    const { wrapper } = await mountAppLayout(ROLE_USERS.TEACHER_AND_HOMEROOM);
+
+    expect(getVisibleGroupHeaders(wrapper)).toEqual([
+      'Students & Classes',
+      'Faculty & Teaching',
+      'Operations & Comms'
+    ]);
+    expect(getVisibleNavLabels(wrapper)).toEqual([
+      'Student Directory & Placements',
+      'Teachers & Assignments',
+      'School Calendar & Academic Cycle',
+      'Announcements & Bulletin'
+    ]);
+    expect(wrapper.find('[data-testid="nav-item-admissions.queue"]').exists()).toBe(false);
   });
 });

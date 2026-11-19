@@ -92,6 +92,7 @@ erDiagram
         varchar admission_status "REGISTERED | ACCEPTED | REJECTED | ENROLLED"
         datetime2 registered_at
         datetime2 decided_at "nullable"
+        nvarchar decision_notes "nullable"
         uniqueidentifier enrolled_student_id "nullable logical ref -> std.students"
         datetime2 created_at
         datetime2 updated_at
@@ -146,6 +147,8 @@ erDiagram
         varchar school_level "SD | SMP | SMA | SMK"
         varchar grade "e.g. 1..12"
         nvarchar name "e.g. 7A, 7B"
+        uniqueidentifier homeroom_teacher_id "nullable logical ref -> tch.teachers"
+        nvarchar homeroom_teacher_name "nullable snapshot from tch.teachers"
         datetime2 created_at
         datetime2 updated_at
     }
@@ -195,6 +198,7 @@ Persists the **Candidate** aggregate root — prospective student applications a
 | `admission_status` | `VARCHAR(20)` | `NO` | — | Set initial `'REGISTERED'`; enforce transitions `REGISTERED -> ACCEPTED \| REJECTED` (`BR-STU-009`) and `ACCEPTED -> ENROLLED` (`BR-STU-005`, `BR-STU-006`) |
 | `registered_at` | `DATETIME2(3)` | `NO` | — | UTC timestamp of candidate registration |
 | `decided_at` | `DATETIME2(3)` | `YES` | — | UTC timestamp when accepted or rejected |
+| `decision_notes` | `NVARCHAR(500)` | `YES` | — | Optional notes or rationale recorded by administrator or principal upon decision |
 | `enrolled_student_id` | `UNIQUEIDENTIFIER` | `YES` | — | Populated with new `std.students(id)` when `admission_status` becomes `'ENROLLED'` |
 | `created_at` | `DATETIME2(3)` | `NO` | — | Populate UTC timestamp on create |
 | `updated_at` | `DATETIME2(3)` | `NO` | — | Populate UTC timestamp on create & update |
@@ -295,6 +299,8 @@ Persists **Study Group** (Rombongan Belajar / Rombel, e.g., `7A`, `7B`, `10 TKJ 
 | `school_level` | `VARCHAR(10)` | `NO` | — | Validate `'SD'`, `'SMP'`, `'SMA'`, or `'SMK'` |
 | `grade` | `VARCHAR(20)` | `NO` | — | Grade within level (e.g., `'1'`..`'12'`) |
 | `name` | `NVARCHAR(50)` | `NO` | `UQ_study_groups_year_name` | Non-blank study group name (e.g., `7A`, `7B`) |
+| `homeroom_teacher_id` | `UNIQUEIDENTIFIER` | `YES` | — | Optional logical reference to assigned homeroom teacher in `tch.teachers(id)` (`UC-HRM-05`) |
+| `homeroom_teacher_name` | `NVARCHAR(150)` | `YES` | — | Snapshot of assigned homeroom teacher display name from `tch.teachers` |
 | `created_at` | `DATETIME2(3)` | `NO` | — | Populate UTC timestamp on create |
 | `updated_at` | `DATETIME2(3)` | `NO` | — | Populate UTC timestamp on create & update |
 
@@ -394,6 +400,7 @@ CREATE TABLE std.candidates (
     admission_status     VARCHAR(20)      NOT NULL,
     registered_at        DATETIME2(3)     NOT NULL,
     decided_at           DATETIME2(3)     NULL,
+    decision_notes       NVARCHAR(500)    NULL,
     enrolled_student_id  UNIQUEIDENTIFIER NULL,
     created_at           DATETIME2(3)     NOT NULL,
     updated_at           DATETIME2(3)     NOT NULL,
@@ -494,6 +501,8 @@ CREATE TABLE std.study_groups (
     school_level        VARCHAR(10)      NOT NULL,
     grade               VARCHAR(20)      NOT NULL,
     name                NVARCHAR(50)     NOT NULL,
+    homeroom_teacher_id UNIQUEIDENTIFIER NULL,
+    homeroom_teacher_name NVARCHAR(150)  NULL,
     created_at          DATETIME2(3)     NOT NULL,
     updated_at          DATETIME2(3)     NOT NULL,
 

@@ -29,6 +29,8 @@ const STATUS_INTENT_MAP: Record<string, StatusIntent> = {
   PAID: 'success',
   PUBLISHED: 'success',
   POSITIVE: 'success',
+  SCHOOL_DAY: 'success',
+  ASSIGNED: 'success',
 
   // Warning / Partial / Attention
   PARTIALLY_PAID: 'warning',
@@ -40,6 +42,7 @@ const STATUS_INTENT_MAP: Record<string, StatusIntent> = {
   VERBAL_WARNING: 'warning',
   WRITTEN_WARNING: 'warning',
   PENDING: 'warning',
+  HOLIDAY: 'warning',
 
   // Danger / Blocked / Terminal Negative
   REJECTED: 'danger',
@@ -49,7 +52,8 @@ const STATUS_INTENT_MAP: Record<string, StatusIntent> = {
   REMOVED: 'danger',
   PARENT_MEETING: 'danger',
   SUSPENSION: 'danger',
-  NEGATIVE: 'danger'
+  NEGATIVE: 'danger',
+  CLOSURE: 'danger'
 };
 
 const INTENT_CLASSES: Record<StatusIntent, string> = {

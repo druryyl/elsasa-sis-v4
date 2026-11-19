@@ -82,7 +82,11 @@ public sealed class IntegrationTestWebApplicationFactory : WebApplicationFactory
         _respawner = await Respawner.CreateAsync(connection, new RespawnerOptions
         {
             DbAdapter = DbAdapter.SqlServer,
-            TablesToIgnore = [new Table("dbo", "SchemaVersions")],
+            TablesToIgnore =
+            [
+                new Table("dbo", "SchemaVersions"),
+                new Table("acd", "subjects")
+            ],
             WithReseed = true
         });
     }

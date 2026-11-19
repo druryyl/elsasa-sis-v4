@@ -9,7 +9,9 @@ public sealed class LayerAndCqrsArchitectureTests
     public static TheoryData<Assembly, string> ModuleAssemblies => new()
     {
         { AssemblyArchitectureContext.AuthModuleAssembly, "ElsasaSis.Modules.Auth" },
-        { AssemblyArchitectureContext.OprModuleAssembly, "ElsasaSis.Modules.Opr" }
+        { AssemblyArchitectureContext.OprModuleAssembly, "ElsasaSis.Modules.Opr" },
+        { AssemblyArchitectureContext.StdModuleAssembly, "ElsasaSis.Modules.Std" },
+        { AssemblyArchitectureContext.TchModuleAssembly, "ElsasaSis.Modules.Tch" }
     };
 
     [Theory]
@@ -44,7 +46,9 @@ public sealed class LayerAndCqrsArchitectureTests
         Assembly[] moduleAssemblies =
         [
             AssemblyArchitectureContext.AuthModuleAssembly,
-            AssemblyArchitectureContext.OprModuleAssembly
+            AssemblyArchitectureContext.OprModuleAssembly,
+            AssemblyArchitectureContext.StdModuleAssembly,
+            AssemblyArchitectureContext.TchModuleAssembly
         ];
 
         var writeHandlers = Types.InAssemblies(moduleAssemblies)

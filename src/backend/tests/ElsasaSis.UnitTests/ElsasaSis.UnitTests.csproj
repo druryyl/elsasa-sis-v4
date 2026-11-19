@@ -13,8 +13,11 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\ElsasaSis.SharedKernel\ElsasaSis.SharedKernel.csproj" />
     <ProjectReference Include="..\..\src\ElsasaSis.Contracts\ElsasaSis.Contracts.csproj" />
+    <ProjectReference Include="..\..\src\ElsasaSis.Database\ElsasaSis.Database.csproj" />
     <ProjectReference Include="..\..\src\Modules\ElsasaSis.Modules.Auth\ElsasaSis.Modules.Auth.csproj" />
     <ProjectReference Include="..\..\src\Modules\ElsasaSis.Modules.Opr\ElsasaSis.Modules.Opr.csproj" />
+    <ProjectReference Include="..\..\src\Modules\ElsasaSis.Modules.Std\ElsasaSis.Modules.Std.csproj" />
+    <ProjectReference Include="..\..\src\Modules\ElsasaSis.Modules.Tch\ElsasaSis.Modules.Tch.csproj" />
   </ItemGroup>
 
   <ItemGroup>

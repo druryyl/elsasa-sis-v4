@@ -30,15 +30,54 @@ public static class RolePermissionCatalog
             [Roles.SchoolAdmin] =
             [
                 Permissions.Operations.Calendar.View,
-                Permissions.Operations.Calendar.Manage
+                Permissions.Operations.Calendar.Manage,
+                Permissions.Operations.Rooms.View,
+                Permissions.Operations.Rooms.Manage,
+                Permissions.Operations.Announcements.View,
+                Permissions.Operations.Announcements.Create,
+                Permissions.Operations.Announcements.Publish,
+                Permissions.Students.Admissions.View,
+                Permissions.Students.Admissions.Register,
+                Permissions.Students.Admissions.Decide,
+                Permissions.Students.Admissions.Enroll,
+                Permissions.Students.Directory.View,
+                Permissions.Students.Directory.Manage,
+                Permissions.Students.Placements.Manage,
+                Permissions.Teaching.Directory.Manage,
+                Permissions.Teaching.Capabilities.Manage,
+                Permissions.Teaching.Assignments.View,
+                Permissions.Teaching.Assignments.Manage,
+                Permissions.Teaching.Assignments.Oversight
             ],
             [Roles.Principal] =
             [
-                Permissions.Operations.Calendar.View
+                Permissions.Operations.Calendar.View,
+                Permissions.Operations.Rooms.View,
+                Permissions.Operations.Announcements.View,
+                Permissions.Students.Admissions.View,
+                Permissions.Students.Admissions.Approve,
+                Permissions.Students.Directory.View,
+                Permissions.Teaching.Assignments.View,
+                Permissions.Teaching.Assignments.Oversight
             ],
-            [Roles.FinanceOfficer] = [],
-            [Roles.Teacher] = [],
-            [Roles.HomeroomTeacher] = [],
+            [Roles.Teacher] =
+            [
+                Permissions.Operations.Calendar.View,
+                Permissions.Operations.Announcements.View,
+                Permissions.Teaching.Assignments.View
+            ],
+            [Roles.HomeroomTeacher] =
+            [
+                Permissions.Operations.Calendar.View,
+                Permissions.Operations.Announcements.View,
+                Permissions.Students.Roster.ViewOwn
+            ],
+            [Roles.FinanceOfficer] =
+            [
+                Permissions.Operations.Calendar.View,
+                Permissions.Operations.Announcements.View,
+                Permissions.Students.Directory.View
+            ],
             [Roles.Parent] = [],
             [Roles.Student] = []
         };

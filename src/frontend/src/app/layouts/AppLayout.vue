@@ -1,17 +1,21 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, ref, watch, type Component } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useQueryClient } from '@tanstack/vue-query';
 import {
   AlertTriangle,
+  BookOpenCheck,
   CalendarDays,
   ChevronDown,
   GraduationCap,
   LogOut,
+  Megaphone,
   Menu,
   PanelLeftClose,
   PanelLeftOpen,
-  User as UserIcon
+  User as UserIcon,
+  UserPlus,
+  Users
 } from 'lucide-vue-next';
 import { useAuthStore } from '@/app/stores/auth.store';
 import { useAppContextStore } from '@/app/stores/appContext.store';
@@ -31,6 +35,7 @@ interface ContextOption {
 interface NavItem {
   label: string;
   to: { name: string };
+  icon: Component;
   permissions: string[];
 }
 
@@ -90,8 +95,7 @@ watch(
   (response) => {
     const items = response?.items ?? [];
     const activeYear = items.find((year) => year.status === 'ACTIVE') ?? null;
-    const activePeriod =
-      activeYear?.periods?.find((period) => period.status === 'ACTIVE') ?? null;
+    const activePeriod = activeYear?.periods?.find((period) => period.status === 'ACTIVE') ?? null;
 
     const prevActiveYearId = appContextStore.activeAcademicYearId;
     const prevActivePeriodId = appContextStore.activePeriodId;
@@ -132,14 +136,73 @@ const selectedContextKey = computed<string>({
 
 const navGroups: NavGroup[] = [
   {
+    group: 'Admissions',
+    items: [
+      {
+        label: 'Admissions Queue',
+        to: { name: 'admissions.queue' },
+        icon: UserPlus,
+        permissions: [
+          'Permissions.Students.Admissions.View',
+          'Permissions.Students.Admissions.Register',
+          'Permissions.Students.Admissions.Decide',
+          'Permissions.Students.Admissions.Approve',
+          'Permissions.Students.Admissions.Enroll'
+        ]
+      }
+    ]
+  },
+  {
+    group: 'Students & Classes',
+    items: [
+      {
+        label: 'Student Directory & Placements',
+        to: { name: 'students.directory' },
+        icon: Users,
+        permissions: [
+          'Permissions.Students.Directory.View',
+          'Permissions.Students.Directory.Manage',
+          'Permissions.Students.Roster.ViewOwn'
+        ]
+      }
+    ]
+  },
+  {
+    group: 'Faculty & Teaching',
+    items: [
+      {
+        label: 'Teachers & Assignments',
+        to: { name: 'teachers.assignments' },
+        icon: BookOpenCheck,
+        permissions: [
+          'Permissions.Teaching.Assignments.View',
+          'Permissions.Teaching.Assignments.Manage',
+          'Permissions.Teaching.Assignments.Oversight',
+          'Permissions.Teaching.Directory.Manage'
+        ]
+      }
+    ]
+  },
+  {
     group: 'Operations & Comms',
     items: [
       {
         label: 'School Calendar & Academic Cycle',
         to: { name: 'operations.calendar' },
+        icon: CalendarDays,
         permissions: [
           'Permissions.Operations.Calendar.View',
           'Permissions.Operations.Calendar.Manage'
+        ]
+      },
+      {
+        label: 'Announcements & Bulletin',
+        to: { name: 'operations.announcements' },
+        icon: Megaphone,
+        permissions: [
+          'Permissions.Operations.Announcements.View',
+          'Permissions.Operations.Announcements.Create',
+          'Permissions.Operations.Announcements.Publish'
         ]
       }
     ]
@@ -299,8 +362,8 @@ async function handleLogout(): Promise<void> {
       <div class="flex items-center gap-2">
         <AlertTriangle class="h-4 w-4 shrink-0 text-amber-600" />
         <p class="font-medium">
-          Viewing Historical Period: {{ appContextStore.currentContextLabel }}. Operational edits are
-          locked in Read-Only Mode.
+          Viewing Historical Period: {{ appContextStore.currentContextLabel }}. Operational edits
+          are locked in Read-Only Mode.
         </p>
       </div>
       <button
@@ -341,8 +404,9 @@ async function handleLogout(): Promise<void> {
                       : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
                   "
                   :title="uiStore.isSidebarCollapsed ? item.label : undefined"
+                  :data-testid="`nav-item-${item.to.name}`"
                 >
-                  <CalendarDays class="h-4 w-4 shrink-0" />
+                  <component :is="item.icon" class="h-4 w-4 shrink-0" />
                   <span v-if="!uiStore.isSidebarCollapsed" class="truncate">
                     {{ item.label }}
                   </span>

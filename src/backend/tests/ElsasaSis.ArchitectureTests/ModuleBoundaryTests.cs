@@ -6,39 +6,49 @@ namespace ElsasaSis.ArchitectureTests;
 public sealed class ModuleBoundaryTests
 {
     [Fact]
-    public void AuthModule_ShouldNotDependOn_OprModule_Api_Or_Database()
+    public void AuthModule_ShouldNotDependOn_OtherModules_Api_Or_Database()
     {
-        var result = Types.InAssembly(AssemblyArchitectureContext.AuthModuleAssembly)
-            .ShouldNot()
-            .HaveDependencyOnAny(
-                "ElsasaSis.Modules.Opr",
-                "ElsasaSis.Api",
-                "ElsasaSis.Database")
-            .GetResult();
-
-        Assert.True(result.IsSuccessful, FormatFailures(result));
-        AssertNoAssemblyReference(
+        AssertModuleIsolation(
             AssemblyArchitectureContext.AuthModuleAssembly,
             "ElsasaSis.Modules.Opr",
+            "ElsasaSis.Modules.Std",
+            "ElsasaSis.Modules.Tch",
             "ElsasaSis.Api",
             "ElsasaSis.Database");
     }
 
     [Fact]
-    public void OprModule_ShouldNotDependOn_AuthModule_Api_Or_Database()
+    public void OprModule_ShouldNotDependOn_OtherModules_Api_Or_Database()
     {
-        var result = Types.InAssembly(AssemblyArchitectureContext.OprModuleAssembly)
-            .ShouldNot()
-            .HaveDependencyOnAny(
-                "ElsasaSis.Modules.Auth",
-                "ElsasaSis.Api",
-                "ElsasaSis.Database")
-            .GetResult();
-
-        Assert.True(result.IsSuccessful, FormatFailures(result));
-        AssertNoAssemblyReference(
+        AssertModuleIsolation(
             AssemblyArchitectureContext.OprModuleAssembly,
             "ElsasaSis.Modules.Auth",
+            "ElsasaSis.Modules.Std",
+            "ElsasaSis.Modules.Tch",
+            "ElsasaSis.Api",
+            "ElsasaSis.Database");
+    }
+
+    [Fact]
+    public void StdModule_ShouldNotDependOn_OtherModules_Api_Or_Database()
+    {
+        AssertModuleIsolation(
+            AssemblyArchitectureContext.StdModuleAssembly,
+            "ElsasaSis.Modules.Auth",
+            "ElsasaSis.Modules.Opr",
+            "ElsasaSis.Modules.Tch",
+            "ElsasaSis.Api",
+            "ElsasaSis.Database");
+    }
+
+    [Fact]
+    public void TchModule_ShouldNotDependOn_OtherModules_Api_Or_Database()
+    {
+        AssertModuleIsolation(
+            AssemblyArchitectureContext.TchModuleAssembly,
+            "ElsasaSis.Modules.Auth",
+            "ElsasaSis.Modules.Opr",
+            "ElsasaSis.Modules.Std",
             "ElsasaSis.Api",
             "ElsasaSis.Database");
     }
@@ -68,6 +78,8 @@ public sealed class ModuleBoundaryTests
                 assembly,
                 "ElsasaSis.Modules.Auth",
                 "ElsasaSis.Modules.Opr",
+                "ElsasaSis.Modules.Std",
+                "ElsasaSis.Modules.Tch",
                 "ElsasaSis.Api",
                 "ElsasaSis.Database");
         }
@@ -95,6 +107,17 @@ public sealed class ModuleBoundaryTests
                 efRefs.Length == 0,
                 $"Assembly '{assembly.GetName().Name}' must not reference EntityFrameworkCore, found: {string.Join(", ", efRefs)}");
         }
+    }
+
+    private static void AssertModuleIsolation(Assembly moduleAssembly, params string[] forbiddenDependencies)
+    {
+        var result = Types.InAssembly(moduleAssembly)
+            .ShouldNot()
+            .HaveDependencyOnAny(forbiddenDependencies)
+            .GetResult();
+
+        Assert.True(result.IsSuccessful, FormatFailures(result));
+        AssertNoAssemblyReference(moduleAssembly, forbiddenDependencies);
     }
 
     private static void AssertNoAssemblyReference(Assembly assembly, params string[] forbiddenAssemblyNames)

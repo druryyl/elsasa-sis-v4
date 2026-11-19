@@ -2,6 +2,8 @@ using System.Reflection;
 using ElsasaSis.Contracts.Operational;
 using ElsasaSis.Modules.Auth;
 using ElsasaSis.Modules.Opr;
+using ElsasaSis.Modules.Std;
+using ElsasaSis.Modules.Tch;
 using ElsasaSis.SharedKernel.Common;
 
 namespace ElsasaSis.ArchitectureTests;
@@ -12,6 +14,8 @@ internal static class AssemblyArchitectureContext
     internal static readonly Assembly ContractsAssembly = typeof(IOperationalContract).Assembly;
     internal static readonly Assembly AuthModuleAssembly = typeof(AuthAssemblyMarker).Assembly;
     internal static readonly Assembly OprModuleAssembly = typeof(OprAssemblyMarker).Assembly;
+    internal static readonly Assembly StdModuleAssembly = typeof(StdAssemblyMarker).Assembly;
+    internal static readonly Assembly TchModuleAssembly = typeof(TchAssemblyMarker).Assembly;
     internal static readonly Assembly ApiAssembly = typeof(Program).Assembly;
     internal static readonly Assembly DatabaseAssembly = Assembly.Load("ElsasaSis.Database");
 
@@ -21,6 +25,8 @@ internal static class AssemblyArchitectureContext
         ContractsAssembly,
         AuthModuleAssembly,
         OprModuleAssembly,
+        StdModuleAssembly,
+        TchModuleAssembly,
         ApiAssembly,
         DatabaseAssembly
     ];
