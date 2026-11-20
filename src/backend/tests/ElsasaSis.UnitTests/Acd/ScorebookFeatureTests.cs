@@ -755,6 +755,13 @@ public sealed class ScorebookFeatureTests
         public StudyGroupSummaryDto? StudyGroupResult { get; set; }
         public Task<StudyGroupSummaryDto?> GetStudyGroupByIdAsync(Guid id, CancellationToken cancellationToken = default) =>
             Task.FromResult(StudyGroupResult);
+
+        public Task<IReadOnlyList<StudentPlacementScopeDto>> GetActiveStudentsByScopeAsync(
+            Guid? studyGroupId,
+            string? schoolLevel,
+            string? grade,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult<IReadOnlyList<StudentPlacementScopeDto>>([]);
     }
 
     private sealed class MockCurrentUser : ICurrentUser

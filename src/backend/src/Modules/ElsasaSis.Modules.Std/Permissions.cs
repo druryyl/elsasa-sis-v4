@@ -41,5 +41,6 @@ public static class Policies
         }
 
         public const string DirectoryOrOwnRoster = "Policies.Students.DirectoryOrOwnRoster";
+        public const string BillingLookup = "Policies.Students.BillingLookup";
     }
 }

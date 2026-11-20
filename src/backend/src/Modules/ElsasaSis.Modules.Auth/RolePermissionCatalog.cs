@@ -56,7 +56,23 @@ public static class RolePermissionCatalog
                 Permissions.Academic.Attendance.View,
                 Permissions.Academic.Attendance.Record,
                 Permissions.Academic.Scorebook.View,
-                Permissions.Academic.Scorebook.Manage
+                Permissions.Academic.Scorebook.Manage,
+                Permissions.Academic.ReportCards.View,
+                Permissions.Academic.ReportCards.Generate,
+                Permissions.Academic.ReportCards.ProvideNotes,
+                Permissions.Academic.ReportCards.Remarks,
+                Permissions.Academic.ReportCards.Finalize,
+                Permissions.Academic.ReportCards.Override,
+                Permissions.Development.Extracurricular.Manage,
+                Permissions.Development.Discipline.Record,
+                Permissions.Development.Achievements.Record,
+                Permissions.Development.Dossier.View,
+                Permissions.Finance.FeePolicy.Manage,
+                Permissions.Finance.Discounts.Manage,
+                Permissions.Finance.Billing.Generate,
+                Permissions.Finance.Billing.ManageAdHoc,
+                Permissions.Finance.Billing.Cancel,
+                Permissions.Finance.Reports.View
             ],
             [Roles.Principal] =
             [
@@ -71,7 +87,11 @@ public static class RolePermissionCatalog
                 Permissions.Operations.Timetables.View,
                 Permissions.Academic.Curriculum.View,
                 Permissions.Academic.Attendance.View,
-                Permissions.Academic.Scorebook.View
+                Permissions.Academic.Scorebook.View,
+                Permissions.Academic.ReportCards.View,
+                Permissions.Development.Discipline.Escalate,
+                Permissions.Development.Dossier.View,
+                Permissions.Finance.Reports.View
             ],
             [Roles.Teacher] =
             [
@@ -83,7 +103,13 @@ public static class RolePermissionCatalog
                 Permissions.Academic.Attendance.View,
                 Permissions.Academic.Attendance.Record,
                 Permissions.Academic.Scorebook.View,
-                Permissions.Academic.Scorebook.Manage
+                Permissions.Academic.Scorebook.Manage,
+                Permissions.Academic.ReportCards.ProvideNotes,
+                Permissions.Development.Behaviour.Record,
+                Permissions.Development.Discipline.Record,
+                Permissions.Development.Achievements.Record,
+                Permissions.Development.Extracurricular.Log,
+                Permissions.Development.Dossier.View
             ],
             [Roles.HomeroomTeacher] =
             [
@@ -96,13 +122,30 @@ public static class RolePermissionCatalog
                 Permissions.Academic.Attendance.Record,
                 Permissions.Academic.Scorebook.View,
                 Permissions.Academic.Scorebook.Manage,
-                Permissions.Students.Roster.ViewOwn
+                Permissions.Students.Roster.ViewOwn,
+                Permissions.Academic.ReportCards.ProvideNotes,
+                Permissions.Academic.ReportCards.Remarks,
+                Permissions.Academic.ReportCards.Finalize,
+                Permissions.Development.Behaviour.Record,
+                Permissions.Development.Discipline.Record,
+                Permissions.Development.Achievements.Record,
+                Permissions.Development.Extracurricular.Log,
+                Permissions.Development.Dossier.View
             ],
             [Roles.FinanceOfficer] =
             [
                 Permissions.Operations.Calendar.View,
                 Permissions.Operations.Announcements.View,
-                Permissions.Students.Directory.View
+                Permissions.Students.Directory.View,
+                Permissions.Finance.FeePolicy.Manage,
+                Permissions.Finance.Discounts.Manage,
+                Permissions.Finance.Billing.Generate,
+                Permissions.Finance.Billing.ManageAdHoc,
+                Permissions.Finance.Billing.Cancel,
+                Permissions.Finance.Payments.Record,
+                Permissions.Finance.Deposits.Allocate,
+                Permissions.Finance.Statements.View,
+                Permissions.Finance.Reports.View
             ],
             [Roles.Parent] = [],
             [Roles.Student] = []

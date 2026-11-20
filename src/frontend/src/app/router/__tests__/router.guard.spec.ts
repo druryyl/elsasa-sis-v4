@@ -362,4 +362,143 @@ describe('Router Auth & Permission Guards', () => {
       expect(blockedRouter.currentRoute.value.name).toBe('forbidden');
     }
   }, 30_000);
+
+  it('redirects unauthenticated requests across all 7 Stage 3 routes to /auth/login', async () => {
+    const stage3Paths = [
+      '/academic/report-cards',
+      '/development/pastoral',
+      '/development/extracurricular',
+      '/finance/fee-policy',
+      '/finance/billing',
+      '/finance/payments',
+      '/finance/receivables'
+    ];
+
+    for (const path of stage3Paths) {
+      const router = createAppRouter(createMemoryHistory());
+      await router.push(path);
+      await router.isReady();
+
+      expect(router.currentRoute.value.name).toBe('auth.login');
+      expect(router.currentRoute.value.query.redirect).toBe(path);
+    }
+  }, 15_000);
+
+  it('enforces Stage 3 route permissions allowing authorized and blocking unauthorized access', async () => {
+    const stage3Cases: Array<{
+      path: string;
+      name: string;
+      validPermissions: string[];
+      unrelatedPermission: string;
+    }> = [
+      {
+        path: '/academic/report-cards',
+        name: 'academic.report-cards',
+        validPermissions: [
+          'Permissions.Academic.ReportCards.View',
+          'Permissions.Academic.ReportCards.Generate',
+          'Permissions.Academic.ReportCards.ProvideNotes',
+          'Permissions.Academic.ReportCards.Remarks',
+          'Permissions.Academic.ReportCards.Finalize'
+        ],
+        unrelatedPermission: 'Permissions.Operations.Calendar.View'
+      },
+      {
+        path: '/development/pastoral',
+        name: 'development.pastoral',
+        validPermissions: [
+          'Permissions.Development.Behaviour.Record',
+          'Permissions.Development.Discipline.Record',
+          'Permissions.Development.Discipline.Escalate',
+          'Permissions.Development.Achievements.Record',
+          'Permissions.Development.Dossier.View'
+        ],
+        unrelatedPermission: 'Permissions.Operations.Calendar.View'
+      },
+      {
+        path: '/development/extracurricular',
+        name: 'development.extracurricular',
+        validPermissions: [
+          'Permissions.Development.Extracurricular.Manage',
+          'Permissions.Development.Extracurricular.Log'
+        ],
+        unrelatedPermission: 'Permissions.Operations.Calendar.View'
+      },
+      {
+        path: '/finance/fee-policy',
+        name: 'finance.fee-policy',
+        validPermissions: [
+          'Permissions.Finance.FeePolicy.Manage',
+          'Permissions.Finance.Discounts.Manage'
+        ],
+        unrelatedPermission: 'Permissions.Operations.Calendar.View'
+      },
+      {
+        path: '/finance/billing',
+        name: 'finance.billing',
+        validPermissions: [
+          'Permissions.Finance.Billing.Generate',
+          'Permissions.Finance.Billing.ManageAdHoc',
+          'Permissions.Finance.Billing.Cancel'
+        ],
+        unrelatedPermission: 'Permissions.Operations.Calendar.View'
+      },
+      {
+        path: '/finance/payments',
+        name: 'finance.payments',
+        validPermissions: [
+          'Permissions.Finance.Payments.Record',
+          'Permissions.Finance.Deposits.Allocate',
+          'Permissions.Finance.Statements.View'
+        ],
+        unrelatedPermission: 'Permissions.Operations.Calendar.View'
+      },
+      {
+        path: '/finance/receivables',
+        name: 'finance.receivables',
+        validPermissions: ['Permissions.Finance.Reports.View'],
+        unrelatedPermission: 'Permissions.Operations.Calendar.View'
+      }
+    ];
+
+    for (const testCase of stage3Cases) {
+      // 1. Verify access succeeds for each valid permission
+      for (const permission of testCase.validPermissions) {
+        const authStore = useAuthStore();
+        authStore.setSession({
+          accessToken: 'token-stage3',
+          user: {
+            id: 'u-stage3',
+            username: 'stage3.user',
+            displayName: 'Stage 3 User',
+            roles: ['SCHOOL_ADMIN'],
+            permissions: [permission]
+          }
+        });
+
+        const router = createAppRouter(createMemoryHistory());
+        await router.push(testCase.path);
+        await router.isReady();
+        expect(router.currentRoute.value.name).toBe(testCase.name);
+      }
+
+      // 2. Verify access blocked when lacking valid permissions
+      const authStore = useAuthStore();
+      authStore.setSession({
+        accessToken: 'token-unauthorized',
+        user: {
+          id: 'u-unauth',
+          username: 'unauth.user',
+          displayName: 'Unauthorized User',
+          roles: ['TEACHER'],
+          permissions: [testCase.unrelatedPermission]
+        }
+      });
+
+      const blockedRouter = createAppRouter(createMemoryHistory());
+      await blockedRouter.push(testCase.path);
+      await blockedRouter.isReady();
+      expect(blockedRouter.currentRoute.value.name).toBe('forbidden');
+    }
+  }, 45_000);
 });

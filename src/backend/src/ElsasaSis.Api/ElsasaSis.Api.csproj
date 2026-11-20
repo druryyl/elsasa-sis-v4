@@ -15,5 +15,7 @@
     <ProjectReference Include="..\Modules\ElsasaSis.Modules.Std\ElsasaSis.Modules.Std.csproj" />
     <ProjectReference Include="..\Modules\ElsasaSis.Modules.Tch\ElsasaSis.Modules.Tch.csproj" />
     <ProjectReference Include="..\Modules\ElsasaSis.Modules.Acd\ElsasaSis.Modules.Acd.csproj" />
+    <ProjectReference Include="..\Modules\ElsasaSis.Modules.Fin\ElsasaSis.Modules.Fin.csproj" />
+    <ProjectReference Include="..\Modules\ElsasaSis.Modules.Dev\ElsasaSis.Modules.Dev.csproj" />
   </ItemGroup>
 </Project>

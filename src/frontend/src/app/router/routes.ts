@@ -137,6 +137,23 @@ export const routes: RouteRecordRaw[] = [
               ],
               title: 'Teacher Scorebook'
             }
+          },
+          {
+            path: 'report-cards',
+            name: 'academic.report-cards',
+            component: () =>
+              import('@/features/academic/report-cards/views/ReportCardsWorkbenchView.vue'),
+            meta: {
+              requiresAuth: true,
+              permission: [
+                'Permissions.Academic.ReportCards.View',
+                'Permissions.Academic.ReportCards.Generate',
+                'Permissions.Academic.ReportCards.ProvideNotes',
+                'Permissions.Academic.ReportCards.Remarks',
+                'Permissions.Academic.ReportCards.Finalize'
+              ],
+              title: 'Semester Report Cards'
+            }
           }
         ]
       },
@@ -197,6 +214,106 @@ export const routes: RouteRecordRaw[] = [
                 'Permissions.Teaching.Directory.Manage'
               ],
               title: 'Teachers & Assignments'
+            }
+          }
+        ]
+      },
+      {
+        path: 'development',
+        children: [
+          {
+            path: 'pastoral',
+            name: 'development.pastoral',
+            component: () =>
+              import('@/features/development/pastoral/views/PastoralDossierView.vue'),
+            meta: {
+              requiresAuth: true,
+              permission: [
+                'Permissions.Development.Behaviour.Record',
+                'Permissions.Development.Discipline.Record',
+                'Permissions.Development.Discipline.Escalate',
+                'Permissions.Development.Achievements.Record',
+                'Permissions.Development.Dossier.View'
+              ],
+              title: 'Pastoral & Discipline'
+            }
+          },
+          {
+            path: 'extracurricular',
+            name: 'development.extracurricular',
+            component: () =>
+              import(
+                '@/features/development/extracurricular/views/ExtracurricularWorkbenchView.vue'
+              ),
+            meta: {
+              requiresAuth: true,
+              permission: [
+                'Permissions.Development.Extracurricular.Manage',
+                'Permissions.Development.Extracurricular.Log'
+              ],
+              title: 'Extracurricular Clubs'
+            }
+          }
+        ]
+      },
+      {
+        path: 'finance',
+        children: [
+          {
+            path: 'fee-policy',
+            name: 'finance.fee-policy',
+            component: () =>
+              import('@/features/finance/fee-policy/views/FeesPolicyView.vue'),
+            meta: {
+              requiresAuth: true,
+              permission: [
+                'Permissions.Finance.FeePolicy.Manage',
+                'Permissions.Finance.Discounts.Manage'
+              ],
+              title: 'Fee Policies & Discounts'
+            }
+          },
+          {
+            path: 'billing',
+            name: 'finance.billing',
+            component: () =>
+              import('@/features/finance/billing/views/BillingWorkbenchView.vue'),
+            meta: {
+              requiresAuth: true,
+              permission: [
+                'Permissions.Finance.Billing.Generate',
+                'Permissions.Finance.Billing.ManageAdHoc',
+                'Permissions.Finance.Billing.Cancel'
+              ],
+              title: 'Tuition Billing'
+            }
+          },
+          {
+            path: 'payments',
+            name: 'finance.payments',
+            component: () =>
+              import('@/features/finance/payments/views/PaymentsWorkbenchView.vue'),
+            meta: {
+              requiresAuth: true,
+              permission: [
+                'Permissions.Finance.Payments.Record',
+                'Permissions.Finance.Deposits.Allocate',
+                'Permissions.Finance.Statements.View'
+              ],
+              title: 'Cashier Counter'
+            }
+          },
+          {
+            path: 'receivables',
+            name: 'finance.receivables',
+            component: () =>
+              import(
+                '@/features/finance/receivables/views/ReceivablesAgingView.vue'
+              ),
+            meta: {
+              requiresAuth: true,
+              permission: ['Permissions.Finance.Reports.View'],
+              title: 'Receivables & Arrears'
             }
           }
         ]

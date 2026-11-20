@@ -14,6 +14,8 @@ public sealed class ModuleBoundaryTests
             "ElsasaSis.Modules.Std",
             "ElsasaSis.Modules.Tch",
             "ElsasaSis.Modules.Acd",
+            "ElsasaSis.Modules.Fin",
+            "ElsasaSis.Modules.Dev",
             "ElsasaSis.Api",
             "ElsasaSis.Database");
     }
@@ -27,6 +29,8 @@ public sealed class ModuleBoundaryTests
             "ElsasaSis.Modules.Std",
             "ElsasaSis.Modules.Tch",
             "ElsasaSis.Modules.Acd",
+            "ElsasaSis.Modules.Fin",
+            "ElsasaSis.Modules.Dev",
             "ElsasaSis.Api",
             "ElsasaSis.Database");
     }
@@ -40,6 +44,8 @@ public sealed class ModuleBoundaryTests
             "ElsasaSis.Modules.Opr",
             "ElsasaSis.Modules.Tch",
             "ElsasaSis.Modules.Acd",
+            "ElsasaSis.Modules.Fin",
+            "ElsasaSis.Modules.Dev",
             "ElsasaSis.Api",
             "ElsasaSis.Database");
     }
@@ -53,6 +59,8 @@ public sealed class ModuleBoundaryTests
             "ElsasaSis.Modules.Opr",
             "ElsasaSis.Modules.Std",
             "ElsasaSis.Modules.Acd",
+            "ElsasaSis.Modules.Fin",
+            "ElsasaSis.Modules.Dev",
             "ElsasaSis.Api",
             "ElsasaSis.Database");
     }
@@ -66,6 +74,38 @@ public sealed class ModuleBoundaryTests
             "ElsasaSis.Modules.Opr",
             "ElsasaSis.Modules.Std",
             "ElsasaSis.Modules.Tch",
+            "ElsasaSis.Modules.Fin",
+            "ElsasaSis.Modules.Dev",
+            "ElsasaSis.Api",
+            "ElsasaSis.Database");
+    }
+
+    [Fact]
+    public void FinModule_ShouldNotDependOn_OtherModules_Api_Or_Database()
+    {
+        AssertModuleIsolation(
+            AssemblyArchitectureContext.FinModuleAssembly,
+            "ElsasaSis.Modules.Auth",
+            "ElsasaSis.Modules.Opr",
+            "ElsasaSis.Modules.Std",
+            "ElsasaSis.Modules.Tch",
+            "ElsasaSis.Modules.Acd",
+            "ElsasaSis.Modules.Dev",
+            "ElsasaSis.Api",
+            "ElsasaSis.Database");
+    }
+
+    [Fact]
+    public void DevModule_ShouldNotDependOn_OtherModules_Api_Or_Database()
+    {
+        AssertModuleIsolation(
+            AssemblyArchitectureContext.DevModuleAssembly,
+            "ElsasaSis.Modules.Auth",
+            "ElsasaSis.Modules.Opr",
+            "ElsasaSis.Modules.Std",
+            "ElsasaSis.Modules.Tch",
+            "ElsasaSis.Modules.Acd",
+            "ElsasaSis.Modules.Fin",
             "ElsasaSis.Api",
             "ElsasaSis.Database");
     }
@@ -98,8 +138,48 @@ public sealed class ModuleBoundaryTests
                 "ElsasaSis.Modules.Std",
                 "ElsasaSis.Modules.Tch",
                 "ElsasaSis.Modules.Acd",
+                "ElsasaSis.Modules.Fin",
+                "ElsasaSis.Modules.Dev",
                 "ElsasaSis.Api",
                 "ElsasaSis.Database");
+        }
+    }
+
+    [Fact]
+    public void AllModules_ShouldOnlyReference_SharedKernel_And_Contracts_AmongInternalAssemblies()
+    {
+        Assembly[] moduleAssemblies =
+        [
+            AssemblyArchitectureContext.AuthModuleAssembly,
+            AssemblyArchitectureContext.OprModuleAssembly,
+            AssemblyArchitectureContext.StdModuleAssembly,
+            AssemblyArchitectureContext.TchModuleAssembly,
+            AssemblyArchitectureContext.AcdModuleAssembly,
+            AssemblyArchitectureContext.FinModuleAssembly,
+            AssemblyArchitectureContext.DevModuleAssembly
+        ];
+
+        string[] allowedInternalAssemblies =
+        [
+            "ElsasaSis.SharedKernel",
+            "ElsasaSis.Contracts"
+        ];
+
+        foreach (var assembly in moduleAssemblies)
+        {
+            var internalReferences = assembly.GetReferencedAssemblies()
+                .Where(r => r.Name is not null && r.Name.StartsWith("ElsasaSis.", StringComparison.OrdinalIgnoreCase))
+                .Select(r => r.Name!)
+                .Where(name => !name.Equals(assembly.GetName().Name, StringComparison.OrdinalIgnoreCase))
+                .ToArray();
+
+            var disallowed = internalReferences
+                .Where(name => !allowedInternalAssemblies.Contains(name, StringComparer.OrdinalIgnoreCase))
+                .ToArray();
+
+            Assert.True(
+                disallowed.Length == 0,
+                $"Module '{assembly.GetName().Name}' references disallowed internal assemblies: {string.Join(", ", disallowed)}. Modules may only reference SharedKernel and Contracts.");
         }
     }
 

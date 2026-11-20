@@ -536,6 +536,13 @@ public sealed class AcademicParticipationFeatureTests
 
         public Task<StudyGroupSummaryDto?> GetStudyGroupByIdAsync(Guid id, CancellationToken cancellationToken = default) =>
             Task.FromResult(StudyGroup?.Id == id ? StudyGroup : null);
+
+        public Task<IReadOnlyList<StudentPlacementScopeDto>> GetActiveStudentsByScopeAsync(
+            Guid? studyGroupId,
+            string? schoolLevel,
+            string? grade,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult<IReadOnlyList<StudentPlacementScopeDto>>([]);
     }
 
     private sealed class MockSqlConnFactory : ISqlConnectionFactory

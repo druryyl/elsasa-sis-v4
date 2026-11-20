@@ -4,22 +4,27 @@ import { useRoute, useRouter } from 'vue-router';
 import { useQueryClient } from '@tanstack/vue-query';
 import {
   AlertTriangle,
+  Award,
   BookOpen,
   BookOpenCheck,
   CalendarClock,
   CalendarDays,
   ChevronDown,
   ClipboardCheck,
+  Coins,
   FileSpreadsheet,
   GraduationCap,
+  HeartPulse,
   LogOut,
   Megaphone,
   Menu,
   PanelLeftClose,
   PanelLeftOpen,
+  Receipt,
   User as UserIcon,
   UserPlus,
-  Users
+  Users,
+  Wallet
 } from 'lucide-vue-next';
 import { useAuthStore } from '@/app/stores/auth.store';
 import { useAppContextStore } from '@/app/stores/appContext.store';
@@ -216,6 +221,84 @@ const navGroups: NavGroup[] = [
           'Permissions.Academic.Curriculum.View',
           'Permissions.Academic.Curriculum.Manage'
         ]
+      },
+      {
+        label: 'Semester Report Cards',
+        to: { name: 'academic.report-cards' },
+        icon: GraduationCap,
+        permissions: [
+          'Permissions.Academic.ReportCards.View',
+          'Permissions.Academic.ReportCards.Generate',
+          'Permissions.Academic.ReportCards.ProvideNotes',
+          'Permissions.Academic.ReportCards.Remarks',
+          'Permissions.Academic.ReportCards.Finalize'
+        ]
+      }
+    ]
+  },
+  {
+    group: 'Student Development',
+    items: [
+      {
+        label: 'Pastoral & Discipline',
+        to: { name: 'development.pastoral' },
+        icon: HeartPulse,
+        permissions: [
+          'Permissions.Development.Behaviour.Record',
+          'Permissions.Development.Discipline.Record',
+          'Permissions.Development.Discipline.Escalate',
+          'Permissions.Development.Achievements.Record',
+          'Permissions.Development.Dossier.View'
+        ]
+      },
+      {
+        label: 'Extracurricular Clubs',
+        to: { name: 'development.extracurricular' },
+        icon: Award,
+        permissions: [
+          'Permissions.Development.Extracurricular.Manage',
+          'Permissions.Development.Extracurricular.Log'
+        ]
+      }
+    ]
+  },
+  {
+    group: 'Finance & Billing',
+    items: [
+      {
+        label: 'Fee Policies & Discounts',
+        to: { name: 'finance.fee-policy' },
+        icon: Coins,
+        permissions: [
+          'Permissions.Finance.FeePolicy.Manage',
+          'Permissions.Finance.Discounts.Manage'
+        ]
+      },
+      {
+        label: 'Tuition Billing',
+        to: { name: 'finance.billing' },
+        icon: FileSpreadsheet,
+        permissions: [
+          'Permissions.Finance.Billing.Generate',
+          'Permissions.Finance.Billing.ManageAdHoc',
+          'Permissions.Finance.Billing.Cancel'
+        ]
+      },
+      {
+        label: 'Cashier Counter',
+        to: { name: 'finance.payments' },
+        icon: Wallet,
+        permissions: [
+          'Permissions.Finance.Payments.Record',
+          'Permissions.Finance.Deposits.Allocate',
+          'Permissions.Finance.Statements.View'
+        ]
+      },
+      {
+        label: 'Receivables & Arrears',
+        to: { name: 'finance.receivables' },
+        icon: Receipt,
+        permissions: ['Permissions.Finance.Reports.View']
       }
     ]
   },

@@ -451,6 +451,9 @@ public sealed class StudentFeaturesTests
             Placement = placement;
             return Task.FromResult(Result.Success());
         }
+
+        public Task MarkAcademicallyCompletedAsync(Guid studentId, Guid operationalPeriodId, CancellationToken cancellationToken = default) =>
+            Task.CompletedTask;
     }
 
     private sealed class MockOperationalContract : IOperationalContract

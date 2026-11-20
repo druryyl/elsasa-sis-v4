@@ -1,5 +1,6 @@
 using ElsasaSis.Contracts.Academic;
 using ElsasaSis.Modules.Acd.Domain;
+using ElsasaSis.Modules.Acd.Domain.ReportCards;
 using ElsasaSis.Modules.Acd.Infrastructure.Contracts;
 using ElsasaSis.Modules.Acd.Infrastructure.Persistence;
 using FluentValidation;
@@ -17,6 +18,7 @@ public static class DependencyInjection
         services.AddScoped<IAttendanceRecordRepository, AttendanceRecordRepository>();
         services.AddScoped<IAcademicParticipationRepository, AcademicParticipationRepository>();
         services.AddScoped<IAssignmentRepository, AssignmentRepository>();
+        services.AddScoped<IReportCardRepository, ReportCardRepository>();
 
         RegisterDiscoveredHandlersAndValidators(services);
 

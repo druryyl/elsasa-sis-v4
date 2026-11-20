@@ -12,7 +12,9 @@ public sealed class LayerAndCqrsArchitectureTests
         { AssemblyArchitectureContext.OprModuleAssembly, "ElsasaSis.Modules.Opr" },
         { AssemblyArchitectureContext.StdModuleAssembly, "ElsasaSis.Modules.Std" },
         { AssemblyArchitectureContext.TchModuleAssembly, "ElsasaSis.Modules.Tch" },
-        { AssemblyArchitectureContext.AcdModuleAssembly, "ElsasaSis.Modules.Acd" }
+        { AssemblyArchitectureContext.AcdModuleAssembly, "ElsasaSis.Modules.Acd" },
+        { AssemblyArchitectureContext.FinModuleAssembly, "ElsasaSis.Modules.Fin" },
+        { AssemblyArchitectureContext.DevModuleAssembly, "ElsasaSis.Modules.Dev" }
     };
 
     [Theory]
@@ -50,7 +52,9 @@ public sealed class LayerAndCqrsArchitectureTests
             AssemblyArchitectureContext.OprModuleAssembly,
             AssemblyArchitectureContext.StdModuleAssembly,
             AssemblyArchitectureContext.TchModuleAssembly,
-            AssemblyArchitectureContext.AcdModuleAssembly
+            AssemblyArchitectureContext.AcdModuleAssembly,
+            AssemblyArchitectureContext.FinModuleAssembly,
+            AssemblyArchitectureContext.DevModuleAssembly
         ];
 
         var writeHandlers = Types.InAssemblies(moduleAssemblies)
@@ -71,6 +75,41 @@ public sealed class LayerAndCqrsArchitectureTests
             .GetResult();
 
         Assert.True(result.IsSuccessful, FormatFailures(result));
+    }
+
+    [Fact]
+    public void AllModuleAssemblies_ShouldNotReference_EntityFrameworkCore()
+    {
+        Assembly[] moduleAssemblies =
+        [
+            AssemblyArchitectureContext.AuthModuleAssembly,
+            AssemblyArchitectureContext.OprModuleAssembly,
+            AssemblyArchitectureContext.StdModuleAssembly,
+            AssemblyArchitectureContext.TchModuleAssembly,
+            AssemblyArchitectureContext.AcdModuleAssembly,
+            AssemblyArchitectureContext.FinModuleAssembly,
+            AssemblyArchitectureContext.DevModuleAssembly
+        ];
+
+        var result = Types.InAssemblies(moduleAssemblies)
+            .ShouldNot()
+            .HaveDependencyOn("Microsoft.EntityFrameworkCore")
+            .GetResult();
+
+        Assert.True(result.IsSuccessful, FormatFailures(result));
+
+        foreach (var assembly in moduleAssemblies)
+        {
+            var efRefs = assembly.GetReferencedAssemblies()
+                .Where(r => r.Name is not null &&
+                            r.Name.StartsWith("Microsoft.EntityFrameworkCore", StringComparison.OrdinalIgnoreCase))
+                .Select(r => r.Name!)
+                .ToArray();
+
+            Assert.True(
+                efRefs.Length == 0,
+                $"Assembly '{assembly.GetName().Name}' must not reference EntityFrameworkCore, found: {string.Join(", ", efRefs)}");
+        }
     }
 
     private static string FormatFailures(TestResult result)

@@ -116,6 +116,53 @@ public sealed class StudentPlacementRepository(ISqlConnectionFactory connectionF
         return null;
     }
 
+    private const string UpdateStudentPlacementCompletionSql = """
+        UPDATE std.student_placements
+           SET is_academically_completed = 1,
+               updated_at = @UtcNow
+         WHERE student_id = @StudentId
+           AND (
+               academic_year_id = @OperationalPeriodId
+               OR academic_year_id IN (
+                   SELECT academic_year_id
+                     FROM opr.operational_periods
+                    WHERE id = @OperationalPeriodId
+               )
+           );
+
+        IF @@ROWCOUNT = 0
+        BEGIN
+            UPDATE std.student_placements
+               SET is_academically_completed = 1,
+                   updated_at = @UtcNow
+             WHERE id = (
+                 SELECT TOP 1 id
+                   FROM std.student_placements
+                  WHERE student_id = @StudentId
+                  ORDER BY created_at DESC
+             );
+        END
+        """;
+
+    public async Task MarkAcademicallyCompletedAsync(
+        Guid studentId,
+        Guid operationalPeriodId,
+        CancellationToken cancellationToken = default)
+    {
+        using var connection = await connectionFactory.CreateOpenConnectionAsync(cancellationToken);
+
+        await connection.ExecuteAsync(
+            new CommandDefinition(
+                UpdateStudentPlacementCompletionSql,
+                new
+                {
+                    StudentId = studentId,
+                    OperationalPeriodId = operationalPeriodId,
+                    UtcNow = DateTime.UtcNow
+                },
+                cancellationToken: cancellationToken));
+    }
+
     private static StudentPlacement? MapRow(StudentPlacementRow? row) =>
         row is null
             ? null

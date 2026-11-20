@@ -50,6 +50,86 @@ public static class Permissions
             public const string View = "Permissions.Academic.Scorebook.View";
             public const string Manage = "Permissions.Academic.Scorebook.Manage";
         }
+
+        public static class ReportCards
+        {
+            public const string View = "Permissions.Academic.ReportCards.View";
+            public const string Generate = "Permissions.Academic.ReportCards.Generate";
+            public const string ProvideNotes = "Permissions.Academic.ReportCards.ProvideNotes";
+            public const string Remarks = "Permissions.Academic.ReportCards.Remarks";
+            public const string Finalize = "Permissions.Academic.ReportCards.Finalize";
+            public const string Override = "Permissions.Academic.ReportCards.Override";
+        }
+    }
+
+    public static class Development
+    {
+        public static class Behaviour
+        {
+            public const string Record = "Permissions.Development.Behaviour.Record";
+        }
+
+        public static class Discipline
+        {
+            public const string Record = "Permissions.Development.Discipline.Record";
+            public const string Escalate = "Permissions.Development.Discipline.Escalate";
+        }
+
+        public static class Achievements
+        {
+            public const string Record = "Permissions.Development.Achievements.Record";
+        }
+
+        public static class Extracurricular
+        {
+            public const string Manage = "Permissions.Development.Extracurricular.Manage";
+            public const string Log = "Permissions.Development.Extracurricular.Log";
+        }
+
+        public static class Dossier
+        {
+            public const string View = "Permissions.Development.Dossier.View";
+        }
+    }
+
+    public static class Finance
+    {
+        public static class FeePolicy
+        {
+            public const string Manage = "Permissions.Finance.FeePolicy.Manage";
+        }
+
+        public static class Discounts
+        {
+            public const string Manage = "Permissions.Finance.Discounts.Manage";
+        }
+
+        public static class Billing
+        {
+            public const string Generate = "Permissions.Finance.Billing.Generate";
+            public const string ManageAdHoc = "Permissions.Finance.Billing.ManageAdHoc";
+            public const string Cancel = "Permissions.Finance.Billing.Cancel";
+        }
+
+        public static class Payments
+        {
+            public const string Record = "Permissions.Finance.Payments.Record";
+        }
+
+        public static class Deposits
+        {
+            public const string Allocate = "Permissions.Finance.Deposits.Allocate";
+        }
+
+        public static class Statements
+        {
+            public const string View = "Permissions.Finance.Statements.View";
+        }
+
+        public static class Reports
+        {
+            public const string View = "Permissions.Finance.Reports.View";
+        }
     }
 
     public static class Students
@@ -131,7 +211,29 @@ public static class Permissions
         Academic.Attendance.View,
         Academic.Attendance.Record,
         Academic.Scorebook.View,
-        Academic.Scorebook.Manage
+        Academic.Scorebook.Manage,
+        Academic.ReportCards.View,
+        Academic.ReportCards.Generate,
+        Academic.ReportCards.ProvideNotes,
+        Academic.ReportCards.Remarks,
+        Academic.ReportCards.Finalize,
+        Academic.ReportCards.Override,
+        Development.Behaviour.Record,
+        Development.Discipline.Record,
+        Development.Discipline.Escalate,
+        Development.Achievements.Record,
+        Development.Extracurricular.Manage,
+        Development.Extracurricular.Log,
+        Development.Dossier.View,
+        Finance.FeePolicy.Manage,
+        Finance.Discounts.Manage,
+        Finance.Billing.Generate,
+        Finance.Billing.ManageAdHoc,
+        Finance.Billing.Cancel,
+        Finance.Payments.Record,
+        Finance.Deposits.Allocate,
+        Finance.Statements.View,
+        Finance.Reports.View
     ];
 }
 
@@ -176,6 +278,32 @@ public static class Policies
         {
             public const string ViewOrManage = "Policies.Academic.Scorebook.ViewOrManage";
         }
+
+        public static class ReportCards
+        {
+            public const string ViewOrManage = "Policies.Academic.ReportCards.ViewOrManage";
+        }
+    }
+
+    public static class Development
+    {
+        public static class Pastoral
+        {
+            public const string RecordOrView = "Policies.Development.Pastoral.RecordOrView";
+        }
+    }
+
+    public static class Finance
+    {
+        public static class Cashier
+        {
+            public const string Manage = "Policies.Finance.Cashier.Manage";
+        }
+
+        public static class Reports
+        {
+            public const string View = "Policies.Finance.Reports.View";
+        }
     }
 
     public static class Students
@@ -186,6 +314,7 @@ public static class Policies
         }
 
         public const string DirectoryOrOwnRoster = "Policies.Students.DirectoryOrOwnRoster";
+        public const string BillingLookup = "Policies.Students.BillingLookup";
     }
 
     public static class Teaching

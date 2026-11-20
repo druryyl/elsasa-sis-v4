@@ -557,6 +557,13 @@ public sealed class TimetableFeaturesTests
 
         public Task<StudyGroupSummaryDto?> GetStudyGroupByIdAsync(Guid id, CancellationToken cancellationToken = default) =>
             Task.FromResult(StudyGroup);
+
+        public Task<IReadOnlyList<StudentPlacementScopeDto>> GetActiveStudentsByScopeAsync(
+            Guid? studyGroupId,
+            string? schoolLevel,
+            string? grade,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult<IReadOnlyList<StudentPlacementScopeDto>>([]);
     }
 
     private sealed class MockAcademicContract : IAcademicContract
