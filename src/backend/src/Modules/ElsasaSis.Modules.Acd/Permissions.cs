@@ -31,6 +31,11 @@ public static class Permissions
             public const string Finalize = "Permissions.Academic.ReportCards.Finalize";
             public const string Override = "Permissions.Academic.ReportCards.Override";
         }
+
+        public static class Monitoring
+        {
+            public const string View = "Permissions.Academic.Monitoring.View";
+        }
     }
 }
 

@@ -29,7 +29,13 @@ const { defineField, handleSubmit, errors, isSubmitting, setErrors } = useForm<L
 const [username, usernameAttrs] = defineField('username');
 const [password, passwordAttrs] = defineField('password');
 
-function resolveRedirectTarget(): string {
+function resolveRedirectTarget(roles: string[] = []): string {
+  if (roles.includes('PARENT')) {
+    return '/portal/parent';
+  }
+  if (roles.includes('STUDENT')) {
+    return '/portal/student';
+  }
   const redirectParam = route.query.redirect;
   if (
     typeof redirectParam === 'string' &&
@@ -64,7 +70,7 @@ const onSubmit = handleSubmit(async (values) => {
       user: sessionUser
     });
 
-    await router.push(resolveRedirectTarget());
+    await router.push(resolveRedirectTarget(sessionUser.roles));
   } catch (err) {
     if (err instanceof ApiError) {
       if (err.status === 401) {

@@ -137,4 +137,7 @@ public static class FinErrors
         DomainError.Conflict(
             "Fin.Deposit.InsufficientBalance",
             $"Available unallocated deposit balance of {available:N2} is insufficient for required allocation of {required:N2}.");
+
+    public static DomainError Forbidden(string message = "You do not have permission to perform this action.") =>
+        DomainError.Forbidden("Auth.Forbidden", message);
 }

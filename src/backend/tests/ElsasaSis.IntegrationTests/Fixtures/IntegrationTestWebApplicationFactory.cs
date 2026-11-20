@@ -142,6 +142,9 @@ public sealed class IntegrationTestWebApplicationFactory : WebApplicationFactory
     public Task SeedStage3FixturesAsync(CancellationToken cancellationToken = default) =>
         Stage3Seeder.SeedStage3FixturesAsync(ConnectionString, cancellationToken);
 
+    public Task SeedStage4FixturesAsync(CancellationToken cancellationToken = default) =>
+        Stage4Seeder.SeedStage4FixturesAsync(ConnectionString, cancellationToken);
+
     async Task IAsyncLifetime.DisposeAsync()
     {
         await base.DisposeAsync();

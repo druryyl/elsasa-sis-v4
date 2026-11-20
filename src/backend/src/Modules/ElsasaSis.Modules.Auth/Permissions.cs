@@ -60,6 +60,11 @@ public static class Permissions
             public const string Finalize = "Permissions.Academic.ReportCards.Finalize";
             public const string Override = "Permissions.Academic.ReportCards.Override";
         }
+
+        public static class Monitoring
+        {
+            public const string View = "Permissions.Academic.Monitoring.View";
+        }
     }
 
     public static class Development
@@ -158,6 +163,11 @@ public static class Permissions
         {
             public const string ViewOwn = "Permissions.Students.Roster.ViewOwn";
         }
+
+        public static class Children
+        {
+            public const string View = "Permissions.Students.Children.View";
+        }
     }
 
     public static class Teaching
@@ -198,6 +208,7 @@ public static class Permissions
         Students.Directory.Manage,
         Students.Placements.Manage,
         Students.Roster.ViewOwn,
+        Students.Children.View,
         Teaching.Directory.Manage,
         Teaching.Capabilities.Manage,
         Teaching.Assignments.View,
@@ -218,6 +229,7 @@ public static class Permissions
         Academic.ReportCards.Remarks,
         Academic.ReportCards.Finalize,
         Academic.ReportCards.Override,
+        Academic.Monitoring.View,
         Development.Behaviour.Record,
         Development.Discipline.Record,
         Development.Discipline.Escalate,

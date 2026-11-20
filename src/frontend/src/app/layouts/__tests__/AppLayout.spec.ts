@@ -182,6 +182,11 @@ async function mountAppLayout(user: AuthUser = ROLE_USERS.SCHOOL_ADMIN!) {
         component: DummyView
       },
       {
+        path: '/academic/monitoring',
+        name: 'academic.monitoring',
+        component: DummyView
+      },
+      {
         path: '/auth/login',
         name: 'auth.login',
         component: DummyView
@@ -501,5 +506,20 @@ describe('AppLayout.vue Role-Filtered Navigation Taxonomy', () => {
     expect(wrapper.find('[data-testid="nav-item-academic.curriculum"]').exists()).toBe(true);
     expect(wrapper.find('[data-testid="nav-item-academic.attendance"]').exists()).toBe(true);
     expect(wrapper.find('[data-testid="nav-item-academic.scorebook"]').exists()).toBe(true);
+  });
+
+  it('renders Academic Progress Monitoring nav item when user holds Permissions.Academic.Monitoring.View', async () => {
+    mockAcademicYearsEndpoint();
+    const stage4User: AuthUser = {
+      ...ROLE_USERS.PRINCIPAL!,
+      permissions: [
+        ...ROLE_USERS.PRINCIPAL!.permissions,
+        'Permissions.Academic.Monitoring.View'
+      ]
+    };
+    const { wrapper } = await mountAppLayout(stage4User);
+
+    expect(wrapper.find('[data-testid="nav-item-academic.monitoring"]').exists()).toBe(true);
+    expect(getVisibleNavLabels(wrapper)).toContain('Academic Progress Monitoring');
   });
 });

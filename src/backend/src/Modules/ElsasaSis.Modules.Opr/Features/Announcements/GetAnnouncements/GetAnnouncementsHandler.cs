@@ -25,6 +25,8 @@ public sealed class GetAnnouncementsHandler(
 
         var hasCreateOrPublish = AnnouncementAccessPolicy.HasCreateOrPublish(currentUser);
         var isTeacherOnly = AnnouncementAccessPolicy.IsTeacherOrHomeroomOnly(currentUser);
+        var isParentOnly = AnnouncementAccessPolicy.IsParentOnly(currentUser);
+        var isStudentOnly = AnnouncementAccessPolicy.IsStudentOnly(currentUser);
 
         var conditions = new List<string>();
 
@@ -33,20 +35,33 @@ public sealed class GetAnnouncementsHandler(
             conditions.Add("a.academic_year_id = @AcademicYearId");
         }
 
-        if (!hasCreateOrPublish)
+        if (isParentOnly)
         {
-            // Read-only callers lacking Create/Publish can only see PUBLISHED announcements.
             conditions.Add("a.status = 'PUBLISHED'");
+            conditions.Add("a.target_audience IN ('ALL', 'PARENTS')");
         }
-        else if (normalizedStatus is not null)
+        else if (isStudentOnly)
         {
-            conditions.Add("a.status = @Status");
+            conditions.Add("a.status = 'PUBLISHED'");
+            conditions.Add("a.target_audience IN ('ALL', 'STUDENTS')");
         }
+        else
+        {
+            if (!hasCreateOrPublish)
+            {
+                // Read-only callers lacking Create/Publish can only see PUBLISHED announcements.
+                conditions.Add("a.status = 'PUBLISHED'");
+            }
+            else if (normalizedStatus is not null)
+            {
+                conditions.Add("a.status = @Status");
+            }
 
-        if (isTeacherOnly)
-        {
-            // Teacher/Homeroom-only callers are scoped to ALL and TEACHERS announcements.
-            conditions.Add("a.target_audience IN ('ALL', 'TEACHERS')");
+            if (isTeacherOnly)
+            {
+                // Teacher/Homeroom-only callers are scoped to ALL and TEACHERS announcements.
+                conditions.Add("a.target_audience IN ('ALL', 'TEACHERS')");
+            }
         }
 
         if (normalizedAudience is not null)

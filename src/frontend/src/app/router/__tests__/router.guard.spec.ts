@@ -501,4 +501,144 @@ describe('Router Auth & Permission Guards', () => {
       expect(blockedRouter.currentRoute.value.name).toBe('forbidden');
     }
   }, 45_000);
+
+  it('redirects authenticated PARENT and STUDENT on guestOnly routes to their respective portals', async () => {
+    // 1. PARENT -> /portal/parent
+    const parentAuthStore = useAuthStore();
+    parentAuthStore.setSession({
+      accessToken: 'token-parent',
+      user: {
+        id: 'u-parent',
+        username: 'parent.hendra',
+        displayName: 'Hendra Dahlan',
+        roles: ['PARENT'],
+        permissions: ['Permissions.Students.Children.View']
+      }
+    });
+
+    const parentRouter = createAppRouter(createMemoryHistory());
+    await parentRouter.push('/auth/login');
+    await parentRouter.isReady();
+    expect(parentRouter.currentRoute.value.name).toBe('portal.parent');
+    expect(parentRouter.currentRoute.value.path).toBe('/portal/parent');
+
+    // 2. STUDENT -> /portal/student
+    const studentAuthStore = useAuthStore();
+    studentAuthStore.setSession({
+      accessToken: 'token-student',
+      user: {
+        id: 'u-student',
+        username: 'student.ahmad',
+        displayName: 'Ahmad Dahlan',
+        roles: ['STUDENT'],
+        permissions: ['Permissions.Operations.Timetables.ViewOwn']
+      }
+    });
+
+    const studentRouter = createAppRouter(createMemoryHistory());
+    await studentRouter.push('/auth/login');
+    await studentRouter.isReady();
+    expect(studentRouter.currentRoute.value.name).toBe('portal.student');
+    expect(studentRouter.currentRoute.value.path).toBe('/portal/student');
+  });
+
+  it('enforces Stage 4 route permissions allowing authorized and blocking unauthorized access', async () => {
+    const stage4Cases = [
+      {
+        path: '/portal/parent',
+        name: 'portal.parent',
+        validPermission: 'Permissions.Students.Children.View',
+        unrelatedPermission: 'Permissions.Operations.Calendar.View',
+        role: 'PARENT'
+      },
+      {
+        path: '/portal/student',
+        name: 'portal.student',
+        validPermission: 'Permissions.Operations.Timetables.ViewOwn',
+        unrelatedPermission: 'Permissions.Operations.Calendar.View',
+        role: 'STUDENT'
+      },
+      {
+        path: '/academic/monitoring',
+        name: 'academic.monitoring',
+        validPermission: 'Permissions.Academic.Monitoring.View',
+        unrelatedPermission: 'Permissions.Operations.Calendar.View',
+        role: 'PRINCIPAL'
+      }
+    ];
+
+    for (const testCase of stage4Cases) {
+      // 1. Authorized
+      const authStore = useAuthStore();
+      authStore.setSession({
+        accessToken: 'token-stage4',
+        user: {
+          id: 'u-s4',
+          username: 's4.user',
+          displayName: 'Stage 4 User',
+          roles: [testCase.role],
+          permissions: [testCase.validPermission]
+        }
+      });
+
+      const router = createAppRouter(createMemoryHistory());
+      await router.push(testCase.path);
+      await router.isReady();
+      expect(router.currentRoute.value.name).toBe(testCase.name);
+
+      // 2. Unauthorized
+      authStore.setSession({
+        accessToken: 'token-unauthorized',
+        user: {
+          id: 'u-unauth',
+          username: 'unauth.user',
+          displayName: 'Unauthorized User',
+          roles: ['TEACHER'],
+          permissions: [testCase.unrelatedPermission]
+        }
+      });
+
+      const blockedRouter = createAppRouter(createMemoryHistory());
+      await blockedRouter.push(testCase.path);
+      await blockedRouter.isReady();
+      expect(blockedRouter.currentRoute.value.name).toBe('forbidden');
+    }
+  });
+
+  it('allows PRINCIPAL, SCHOOL_ADMIN, and FINANCE_OFFICER to access /finance/receivables without cashier write permission', async () => {
+    const rolesWithReportsPermission = [
+      {
+        role: 'PRINCIPAL',
+        permissions: ['Permissions.Finance.Reports.View'] // strictly lacks Permissions.Finance.Payments.Record
+      },
+      {
+        role: 'SCHOOL_ADMIN',
+        permissions: ['Permissions.Finance.Reports.View', 'Permissions.Finance.Payments.Record']
+      },
+      {
+        role: 'FINANCE_OFFICER',
+        permissions: ['Permissions.Finance.Reports.View', 'Permissions.Finance.Payments.Record']
+      }
+    ];
+
+    for (const testCase of rolesWithReportsPermission) {
+      const authStore = useAuthStore();
+      authStore.setSession({
+        accessToken: `token-${testCase.role}`,
+        user: {
+          id: `u-${testCase.role}`,
+          username: testCase.role.toLowerCase(),
+          displayName: testCase.role,
+          roles: [testCase.role],
+          permissions: testCase.permissions
+        }
+      });
+
+      const router = createAppRouter(createMemoryHistory());
+      await router.push('/finance/receivables');
+      await router.isReady();
+      expect(router.currentRoute.value.name).toBe('finance.receivables');
+      expect(router.currentRoute.value.path).toBe('/finance/receivables');
+    }
+  });
 });

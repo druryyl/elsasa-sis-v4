@@ -3,6 +3,7 @@ import { computed, ref, watch, type Component } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useQueryClient } from '@tanstack/vue-query';
 import {
+  Activity,
   AlertTriangle,
   Award,
   BookOpen,
@@ -213,6 +214,12 @@ const navGroups: NavGroup[] = [
   {
     group: 'Academic & Curriculum',
     items: [
+      {
+        label: 'Academic Progress Monitoring',
+        to: { name: 'academic.monitoring' },
+        icon: Activity,
+        permissions: ['Permissions.Academic.Monitoring.View']
+      },
       {
         label: 'Curriculum & Learning Structure',
         to: { name: 'academic.curriculum' },

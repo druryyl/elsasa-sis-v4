@@ -567,6 +567,63 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/acd/monitoring/progress": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    academicYearId?: string;
+                    operationalPeriodId?: string;
+                    date?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AcademicMonitoringProgressDto"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/acd/participations/batch": {
         parameters: {
             query?: never;
@@ -687,6 +744,61 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["SubjectStageParticipationDto"][];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/acd/report-cards/student/{studentId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    studentId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["StudentReportCardSummaryDto"][];
                     };
                 };
                 /** @description Unauthorized */
@@ -5585,6 +5697,61 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/opr/timetables/my": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    date?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["StudentPersonalScheduleResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/opr/teacher-schedule": {
         parameters: {
             query?: never;
@@ -6669,6 +6836,59 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["StudentBillingContactDto"][];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/std/students/my-children": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["LinkedChildDto"][];
                     };
                 };
                 /** @description Unauthorized */
@@ -8397,6 +8617,48 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        AcademicMonitoringExceptionsDto: {
+            missingAttendanceStudyGroups?: components["schemas"]["MissingAttendanceAlertDto"][] | null;
+            overdueGradingAssignments?: components["schemas"]["OverdueGradingAlertDto"][] | null;
+            pendingReportCards?: components["schemas"]["PendingReportCardAlertDto"][] | null;
+        };
+        AcademicMonitoringOverviewDto: {
+            /** Format: double */
+            attendanceRateTodayPercent?: number;
+            /** Format: int32 */
+            totalEnrolledStudentsCount?: number;
+            /** Format: int32 */
+            presentCount?: number;
+            /** Format: int32 */
+            absentCount?: number;
+            /** Format: int32 */
+            sickCount?: number;
+            /** Format: int32 */
+            lateCount?: number;
+            /** Format: int32 */
+            excusedCount?: number;
+            /** Format: double */
+            gradingCompletenessPercent?: number;
+            /** Format: int32 */
+            totalAssignmentsCount?: number;
+            /** Format: int32 */
+            expectedScoresCount?: number;
+            /** Format: int32 */
+            actualScoresCount?: number;
+            /** Format: double */
+            reportCardsFinalizedPercent?: number;
+            /** Format: int32 */
+            totalPlacedStudentsCount?: number;
+            /** Format: int32 */
+            draftReportCardsCount?: number;
+            /** Format: int32 */
+            finalizedReportCardsCount?: number;
+        };
+        AcademicMonitoringProgressDto: {
+            overview?: components["schemas"]["AcademicMonitoringOverviewDto"];
+            exceptions?: components["schemas"]["AcademicMonitoringExceptionsDto"];
+            studyGroups?: components["schemas"]["StudyGroupMonitoringRowDto"][] | null;
+        };
         AcademicYearDto: {
             /** Format: uuid */
             id?: string;
@@ -8444,6 +8706,14 @@ export interface components {
             recorderName?: string | null;
             /** Format: date-time */
             createdAt?: string;
+        };
+        ActiveSmkCycleDto: {
+            scheduleType?: string | null;
+            isSmkRotation?: boolean;
+            /** Format: date */
+            startDate?: string | null;
+            /** Format: date */
+            endDate?: string | null;
         };
         AddStudentGuardianRequest: {
             fullName?: string | null;
@@ -9347,6 +9617,22 @@ export interface components {
             unitType?: string | null;
             description?: string | null;
         };
+        LinkedChildDto: {
+            /** Format: uuid */
+            studentId?: string;
+            nis?: string | null;
+            nisn?: string | null;
+            fullName?: string | null;
+            nickname?: string | null;
+            /** Format: date-time */
+            dateOfBirth?: string;
+            gender?: string | null;
+            /** Format: uuid */
+            studyGroupId?: string | null;
+            studyGroupName?: string | null;
+            schoolLevel?: string | null;
+            grade?: string | null;
+        };
         LoginRequest: {
             username?: string | null;
             password?: string | null;
@@ -9360,6 +9646,14 @@ export interface components {
         MapSubjectStageGradeRequest: {
             schoolLevel?: string | null;
             grade?: string | null;
+        };
+        MissingAttendanceAlertDto: {
+            /** Format: uuid */
+            studyGroupId?: string;
+            studyGroupName?: string | null;
+            schoolLevel?: string | null;
+            grade?: string | null;
+            homeroomTeacherName?: string | null;
         };
         NextNisResponse: {
             suggestedNis?: string | null;
@@ -9379,6 +9673,18 @@ export interface components {
             createdAt?: string;
             /** Format: date-time */
             updatedAt?: string;
+        };
+        OverdueGradingAlertDto: {
+            /** Format: uuid */
+            assignmentId?: string;
+            title?: string | null;
+            subjectName?: string | null;
+            teacherName?: string | null;
+            studyGroupName?: string | null;
+            /** Format: int32 */
+            daysOverdue?: number;
+            /** Format: int32 */
+            missingScoresCount?: number;
         };
         OverrideReportCardStatusRequest: {
             overrideReason?: string | null;
@@ -9494,6 +9800,18 @@ export interface components {
             /** Format: date-time */
             createdAt?: string;
             allocations?: components["schemas"]["PaymentAllocationDto"][] | null;
+        };
+        PendingReportCardAlertDto: {
+            /** Format: uuid */
+            studyGroupId?: string;
+            studyGroupName?: string | null;
+            schoolLevel?: string | null;
+            grade?: string | null;
+            homeroomTeacherName?: string | null;
+            /** Format: int32 */
+            draftCount?: number;
+            /** Format: int32 */
+            totalCount?: number;
         };
         PlaceStudentFlatRequest: {
             /** Format: uuid */
@@ -9867,6 +10185,26 @@ export interface components {
             /** Format: int32 */
             readonly totalPages?: number;
         };
+        ScheduleSlotDto: {
+            /** Format: uuid */
+            id?: string;
+            dayOfWeek?: string | null;
+            /** Format: int32 */
+            periodSlot?: number;
+            startTime?: string | null;
+            endTime?: string | null;
+            /** Format: uuid */
+            subjectId?: string;
+            subjectName?: string | null;
+            subjectCode?: string | null;
+            /** Format: uuid */
+            teacherId?: string;
+            teacherName?: string | null;
+            /** Format: uuid */
+            roomId?: string | null;
+            roomName?: string | null;
+            scheduleType?: string | null;
+        };
         ScoreEntryItemDto: {
             /** Format: uuid */
             studentId?: string;
@@ -10090,6 +10428,12 @@ export interface components {
             /** Format: int32 */
             readonly totalPages?: number;
         };
+        StudentPersonalScheduleResponse: {
+            studentInfo?: components["schemas"]["StudentTimetableInfoDto"];
+            activeCycle?: components["schemas"]["ActiveSmkCycleDto"];
+            todayAgenda?: components["schemas"]["ScheduleSlotDto"][] | null;
+            weeklySchedule?: components["schemas"]["ScheduleSlotDto"][] | null;
+        };
         StudentPlacementDto: {
             /** Format: uuid */
             id?: string;
@@ -10110,6 +10454,19 @@ export interface components {
             createdAt?: string;
             /** Format: date-time */
             updatedAt?: string;
+        };
+        StudentReportCardSummaryDto: {
+            /** Format: uuid */
+            id?: string;
+            /** Format: uuid */
+            studentId?: string;
+            studentName?: string | null;
+            academicYearName?: string | null;
+            operationalPeriodName?: string | null;
+            studyGroupName?: string | null;
+            status?: string | null;
+            /** Format: date-time */
+            finalizedAt?: string | null;
         };
         StudentStatementAllocationDto: {
             /** Format: uuid */
@@ -10205,6 +10562,17 @@ export interface components {
             createdAt?: string;
             allocations?: components["schemas"]["StudentStatementAllocationDto"][] | null;
         };
+        StudentTimetableInfoDto: {
+            /** Format: uuid */
+            studentId?: string;
+            fullName?: string | null;
+            nis?: string | null;
+            /** Format: uuid */
+            studyGroupId?: string | null;
+            studyGroupName?: string | null;
+            schoolLevel?: string | null;
+            grade?: string | null;
+        };
         StudyGroupDto: {
             /** Format: uuid */
             id?: string;
@@ -10251,6 +10619,24 @@ export interface components {
             totalCount?: number;
             /** Format: int32 */
             readonly totalPages?: number;
+        };
+        StudyGroupMonitoringRowDto: {
+            /** Format: uuid */
+            studyGroupId?: string;
+            studyGroupName?: string | null;
+            schoolLevel?: string | null;
+            grade?: string | null;
+            homeroomTeacherName?: string | null;
+            /** Format: double */
+            attendanceTodayPercent?: number;
+            /** Format: int32 */
+            assignmentsCount?: number;
+            /** Format: double */
+            gradingCompletenessPercent?: number;
+            reportCardsFinalizedRatio?: string | null;
+            isAttendanceMissingToday?: boolean;
+            hasOverdueGrading?: boolean;
+            hasPendingReportCards?: boolean;
         };
         StudyGroupRosterDto: {
             /** Format: uuid */

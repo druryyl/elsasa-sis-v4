@@ -675,6 +675,71 @@
         }
       }
     },
+    "/api/acd/monitoring/progress": {
+      "get": {
+        "tags": [
+          "Academic - Monitoring"
+        ],
+        "parameters": [
+          {
+            "name": "academicYearId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "operationalPeriodId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "date",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcademicMonitoringProgressDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/acd/participations/batch": {
       "post": {
         "tags": [
@@ -804,6 +869,59 @@
                   "type": "array",
                   "items": {
                     "$ref": "#/components/schemas/SubjectStageParticipationDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/acd/report-cards/student/{studentId}": {
+      "get": {
+        "tags": [
+          "Academic - Report Cards"
+        ],
+        "parameters": [
+          {
+            "name": "studentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StudentReportCardSummaryDto"
                   }
                 }
               }
@@ -6005,6 +6123,55 @@
         }
       }
     },
+    "/api/opr/timetables/my": {
+      "get": {
+        "tags": [
+          "Operations - Timetables"
+        ],
+        "parameters": [
+          {
+            "name": "date",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudentPersonalScheduleResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/opr/teacher-schedule": {
       "get": {
         "tags": [
@@ -7119,6 +7286,48 @@
                   "type": "array",
                   "items": {
                     "$ref": "#/components/schemas/StudentBillingContactDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/std/students/my-children": {
+      "get": {
+        "tags": [
+          "Students - Children"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LinkedChildDto"
                   }
                 }
               }
@@ -9100,6 +9309,118 @@
   },
   "components": {
     "schemas": {
+      "AcademicMonitoringExceptionsDto": {
+        "type": "object",
+        "properties": {
+          "missingAttendanceStudyGroups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MissingAttendanceAlertDto"
+            },
+            "nullable": true
+          },
+          "overdueGradingAssignments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OverdueGradingAlertDto"
+            },
+            "nullable": true
+          },
+          "pendingReportCards": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PendingReportCardAlertDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "AcademicMonitoringOverviewDto": {
+        "type": "object",
+        "properties": {
+          "attendanceRateTodayPercent": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalEnrolledStudentsCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "presentCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "absentCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sickCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "lateCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "excusedCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "gradingCompletenessPercent": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalAssignmentsCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "expectedScoresCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "actualScoresCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "reportCardsFinalizedPercent": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalPlacedStudentsCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "draftReportCardsCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "finalizedReportCardsCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AcademicMonitoringProgressDto": {
+        "type": "object",
+        "properties": {
+          "overview": {
+            "$ref": "#/components/schemas/AcademicMonitoringOverviewDto"
+          },
+          "exceptions": {
+            "$ref": "#/components/schemas/AcademicMonitoringExceptionsDto"
+          },
+          "studyGroups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StudyGroupMonitoringRowDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "AcademicYearDto": {
         "type": "object",
         "properties": {
@@ -9230,6 +9551,29 @@
           "createdAt": {
             "type": "string",
             "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ActiveSmkCycleDto": {
+        "type": "object",
+        "properties": {
+          "scheduleType": {
+            "type": "string",
+            "nullable": true
+          },
+          "isSmkRotation": {
+            "type": "boolean"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -11725,6 +12069,57 @@
         },
         "additionalProperties": false
       },
+      "LinkedChildDto": {
+        "type": "object",
+        "properties": {
+          "studentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "nis": {
+            "type": "string",
+            "nullable": true
+          },
+          "nisn": {
+            "type": "string",
+            "nullable": true
+          },
+          "fullName": {
+            "type": "string",
+            "nullable": true
+          },
+          "nickname": {
+            "type": "string",
+            "nullable": true
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "gender": {
+            "type": "string",
+            "nullable": true
+          },
+          "studyGroupId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "studyGroupName": {
+            "type": "string",
+            "nullable": true
+          },
+          "schoolLevel": {
+            "type": "string",
+            "nullable": true
+          },
+          "grade": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "LoginRequest": {
         "type": "object",
         "properties": {
@@ -11764,6 +12159,32 @@
             "nullable": true
           },
           "grade": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "MissingAttendanceAlertDto": {
+        "type": "object",
+        "properties": {
+          "studyGroupId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "studyGroupName": {
+            "type": "string",
+            "nullable": true
+          },
+          "schoolLevel": {
+            "type": "string",
+            "nullable": true
+          },
+          "grade": {
+            "type": "string",
+            "nullable": true
+          },
+          "homeroomTeacherName": {
             "type": "string",
             "nullable": true
           }
@@ -11814,6 +12235,40 @@
           "updatedAt": {
             "type": "string",
             "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "OverdueGradingAlertDto": {
+        "type": "object",
+        "properties": {
+          "assignmentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "subjectName": {
+            "type": "string",
+            "nullable": true
+          },
+          "teacherName": {
+            "type": "string",
+            "nullable": true
+          },
+          "studyGroupName": {
+            "type": "string",
+            "nullable": true
+          },
+          "daysOverdue": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "missingScoresCount": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -12124,6 +12579,40 @@
               "$ref": "#/components/schemas/PaymentAllocationDto"
             },
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PendingReportCardAlertDto": {
+        "type": "object",
+        "properties": {
+          "studyGroupId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "studyGroupName": {
+            "type": "string",
+            "nullable": true
+          },
+          "schoolLevel": {
+            "type": "string",
+            "nullable": true
+          },
+          "grade": {
+            "type": "string",
+            "nullable": true
+          },
+          "homeroomTeacherName": {
+            "type": "string",
+            "nullable": true
+          },
+          "draftCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -13178,6 +13667,65 @@
         },
         "additionalProperties": false
       },
+      "ScheduleSlotDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "dayOfWeek": {
+            "type": "string",
+            "nullable": true
+          },
+          "periodSlot": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "startTime": {
+            "type": "string",
+            "nullable": true
+          },
+          "endTime": {
+            "type": "string",
+            "nullable": true
+          },
+          "subjectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "subjectName": {
+            "type": "string",
+            "nullable": true
+          },
+          "subjectCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "teacherId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "teacherName": {
+            "type": "string",
+            "nullable": true
+          },
+          "roomId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "roomName": {
+            "type": "string",
+            "nullable": true
+          },
+          "scheduleType": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "ScoreEntryItemDto": {
         "type": "object",
         "properties": {
@@ -13856,6 +14404,32 @@
         },
         "additionalProperties": false
       },
+      "StudentPersonalScheduleResponse": {
+        "type": "object",
+        "properties": {
+          "studentInfo": {
+            "$ref": "#/components/schemas/StudentTimetableInfoDto"
+          },
+          "activeCycle": {
+            "$ref": "#/components/schemas/ActiveSmkCycleDto"
+          },
+          "todayAgenda": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ScheduleSlotDto"
+            },
+            "nullable": true
+          },
+          "weeklySchedule": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ScheduleSlotDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "StudentPlacementDto": {
         "type": "object",
         "properties": {
@@ -13908,6 +14482,45 @@
           "updatedAt": {
             "type": "string",
             "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "StudentReportCardSummaryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "studentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "studentName": {
+            "type": "string",
+            "nullable": true
+          },
+          "academicYearName": {
+            "type": "string",
+            "nullable": true
+          },
+          "operationalPeriodName": {
+            "type": "string",
+            "nullable": true
+          },
+          "studyGroupName": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "nullable": true
+          },
+          "finalizedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -14164,6 +14777,41 @@
         },
         "additionalProperties": false
       },
+      "StudentTimetableInfoDto": {
+        "type": "object",
+        "properties": {
+          "studentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "fullName": {
+            "type": "string",
+            "nullable": true
+          },
+          "nis": {
+            "type": "string",
+            "nullable": true
+          },
+          "studyGroupId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "studyGroupName": {
+            "type": "string",
+            "nullable": true
+          },
+          "schoolLevel": {
+            "type": "string",
+            "nullable": true
+          },
+          "grade": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "StudyGroupDto": {
         "type": "object",
         "properties": {
@@ -14288,6 +14936,57 @@
             "type": "integer",
             "format": "int32",
             "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "StudyGroupMonitoringRowDto": {
+        "type": "object",
+        "properties": {
+          "studyGroupId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "studyGroupName": {
+            "type": "string",
+            "nullable": true
+          },
+          "schoolLevel": {
+            "type": "string",
+            "nullable": true
+          },
+          "grade": {
+            "type": "string",
+            "nullable": true
+          },
+          "homeroomTeacherName": {
+            "type": "string",
+            "nullable": true
+          },
+          "attendanceTodayPercent": {
+            "type": "number",
+            "format": "double"
+          },
+          "assignmentsCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "gradingCompletenessPercent": {
+            "type": "number",
+            "format": "double"
+          },
+          "reportCardsFinalizedRatio": {
+            "type": "string",
+            "nullable": true
+          },
+          "isAttendanceMissingToday": {
+            "type": "boolean"
+          },
+          "hasOverdueGrading": {
+            "type": "boolean"
+          },
+          "hasPendingReportCards": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false

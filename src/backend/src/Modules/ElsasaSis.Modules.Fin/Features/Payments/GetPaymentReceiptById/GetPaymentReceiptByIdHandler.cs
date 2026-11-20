@@ -2,11 +2,21 @@ using Dapper;
 using ElsasaSis.Modules.Fin.Domain;
 using ElsasaSis.SharedKernel.Common;
 using ElsasaSis.SharedKernel.Persistence;
+using ElsasaSis.SharedKernel.Security;
 
 namespace ElsasaSis.Modules.Fin.Features.Payments.GetPaymentReceiptById;
 
-public sealed class GetPaymentReceiptByIdHandler(ISqlConnectionFactory connectionFactory)
+public sealed class GetPaymentReceiptByIdHandler(
+    ISqlConnectionFactory connectionFactory,
+    ICurrentUser currentUser)
 {
+    private const string CheckChildOwnershipSql = """
+        SELECT 1
+        FROM auth.user_students us
+        WHERE us.user_id = @UserId
+          AND us.student_id = @StudentId;
+        """;
+
     private const string SelectReceiptSql = """
         SELECT
             id AS Id,
@@ -61,6 +71,27 @@ public sealed class GetPaymentReceiptByIdHandler(ISqlConnectionFactory connectio
         }
 
         var allocationRows = (await multi.ReadAsync<AllocationRow>()).ToList();
+
+        var isParent = currentUser.Roles.Any(r => string.Equals(r, "PARENT", StringComparison.OrdinalIgnoreCase));
+        var isElevatedStaff = currentUser.Roles.Any(r =>
+            string.Equals(r, "FINANCE_OFFICER", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(r, "SCHOOL_ADMIN", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(r, "PRINCIPAL", StringComparison.OrdinalIgnoreCase));
+
+        if (isParent && !isElevatedStaff)
+        {
+            var isAuthorized = await connection.ExecuteScalarAsync<int?>(
+                new CommandDefinition(
+                    CheckChildOwnershipSql,
+                    new { UserId = currentUser.UserId, StudentId = receiptRow.StudentId },
+                    cancellationToken: cancellationToken));
+
+            if (!isAuthorized.HasValue)
+            {
+                return Result<PaymentReceiptDetailDto>.Failure(
+                    FinErrors.Forbidden("You do not have permission to view this payment receipt."));
+            }
+        }
 
         var allocations = allocationRows.Select(a => new PaymentReceiptAllocationDetailDto(
             a.Id,

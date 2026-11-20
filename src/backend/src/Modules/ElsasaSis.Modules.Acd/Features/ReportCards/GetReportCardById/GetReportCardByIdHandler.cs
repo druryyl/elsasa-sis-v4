@@ -2,10 +2,13 @@ using Dapper;
 using ElsasaSis.Modules.Acd.Domain;
 using ElsasaSis.SharedKernel.Common;
 using ElsasaSis.SharedKernel.Persistence;
+using ElsasaSis.SharedKernel.Security;
 
 namespace ElsasaSis.Modules.Acd.Features.ReportCards.GetReportCardById;
 
-public sealed class GetReportCardByIdHandler(ISqlConnectionFactory connectionFactory)
+public sealed class GetReportCardByIdHandler(
+    ISqlConnectionFactory connectionFactory,
+    ICurrentUser currentUser)
 {
     private const string SelectReportCardHeaderSql = """
         SELECT 
@@ -30,6 +33,12 @@ public sealed class GetReportCardByIdHandler(ISqlConnectionFactory connectionFac
             updated_at AS UpdatedAt
         FROM acd.report_cards
         WHERE id = @Id;
+        """;
+
+    private const string VerifyChildSql = """
+        SELECT 1 
+        FROM auth.user_students 
+        WHERE user_id = @UserId AND student_id = @StudentId;
         """;
 
     private const string SelectReportCardEntriesSql = """
@@ -74,6 +83,26 @@ public sealed class GetReportCardByIdHandler(ISqlConnectionFactory connectionFac
         if (header is null)
         {
             return Result<ReportCardDetailDto>.Failure(AcdErrors.ReportCards.ReportCardNotFound(id));
+        }
+
+        if (currentUser.Roles.Contains("PARENT", StringComparer.OrdinalIgnoreCase))
+        {
+            var isLinked = await connection.ExecuteScalarAsync<int?>(
+                new CommandDefinition(
+                    VerifyChildSql,
+                    new { UserId = currentUser.UserId, StudentId = header.StudentId },
+                    cancellationToken: cancellationToken));
+
+            if (isLinked is null or 0)
+            {
+                return Result<ReportCardDetailDto>.Failure(
+                    DomainError.Forbidden("Auth.Forbidden", "You do not have permission to view this report card."));
+            }
+
+            if (!string.Equals(header.Status, "FINALIZED", StringComparison.OrdinalIgnoreCase))
+            {
+                return Result<ReportCardDetailDto>.Failure(AcdErrors.ReportCards.ReportCardNotFound(id));
+            }
         }
 
         var entries = (await connection.QueryAsync<ReportCardEntryDetailDto>(

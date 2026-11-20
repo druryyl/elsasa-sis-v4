@@ -12,8 +12,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test:unit": "vitest run",
-    "api:generate": "openapi-typescript http://localhost:5000/swagger/v1/swagger.json -o src/shared/types/api/schema.d.ts",
-    "api:check": "openapi-typescript http://localhost:5000/swagger/v1/swagger.json -o src/shared/types/api/schema.d.ts --check"
+    "api:generate": "openapi-typescript swagger.json -o src/shared/types/api/schema.d.ts",
+    "api:check": "openapi-typescript swagger.json -o src/shared/types/api/schema.d.ts --check"
   },
   "dependencies": {
     "@primeuix/themes": "^1.0.0",

@@ -3,13 +3,22 @@ using ElsasaSis.Contracts.Student;
 using ElsasaSis.Modules.Fin.Domain;
 using ElsasaSis.SharedKernel.Common;
 using ElsasaSis.SharedKernel.Persistence;
+using ElsasaSis.SharedKernel.Security;
 
 namespace ElsasaSis.Modules.Fin.Features.Payments.GetStudentStatement;
 
 public sealed class GetStudentStatementHandler(
     ISqlConnectionFactory connectionFactory,
-    IStudentContract studentContract)
+    IStudentContract studentContract,
+    ICurrentUser currentUser)
 {
+    private const string CheckChildOwnershipSql = """
+        SELECT 1
+        FROM auth.user_students
+        WHERE user_id = @UserId
+          AND student_id = @StudentId;
+        """;
+
     private const string SelectChargesSql = """
         SELECT
             id AS Id,
@@ -93,6 +102,27 @@ public sealed class GetStudentStatementHandler(
         CancellationToken cancellationToken = default)
     {
         using var connection = await connectionFactory.CreateOpenConnectionAsync(cancellationToken);
+
+        var isParent = currentUser.Roles.Any(r => string.Equals(r, "PARENT", StringComparison.OrdinalIgnoreCase));
+        var isElevatedStaff = currentUser.Roles.Any(r =>
+            string.Equals(r, "FINANCE_OFFICER", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(r, "SCHOOL_ADMIN", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(r, "PRINCIPAL", StringComparison.OrdinalIgnoreCase));
+
+        if (isParent && !isElevatedStaff)
+        {
+            var isAuthorized = await connection.ExecuteScalarAsync<int?>(
+                new CommandDefinition(
+                    CheckChildOwnershipSql,
+                    new { UserId = currentUser.UserId, StudentId = query.StudentId },
+                    cancellationToken: cancellationToken));
+
+            if (!isAuthorized.HasValue)
+            {
+                return Result<StudentStatementDto>.Failure(
+                    FinErrors.Forbidden("You do not have permission to view financial statements for this student."));
+            }
+        }
 
         var chargesSqlCmd = new CommandDefinition(SelectChargesSql, new { query.StudentId }, cancellationToken: cancellationToken);
         var charges = (await connection.QueryAsync<ChargeRow>(chargesSqlCmd)).ToList();
@@ -250,26 +280,28 @@ public sealed class GetStudentStatementHandler(
         DateTime? DueDate,
         DateTime CreatedAt);
 
-    private sealed record ReceiptRow(
-        Guid Id,
-        string ReceiptNumber,
-        Guid AcademicYearId,
-        string AcademicYearName,
-        Guid StudentId,
-        string StudentName,
-        string StudentNis,
-        Guid? StudyGroupId,
-        string? StudyGroupName,
-        DateTime PaymentDate,
-        string PaymentMethod,
-        string? BankReference,
-        decimal TotalAmount,
-        decimal AllocatedAmount,
-        decimal UnallocatedAmount,
-        Guid ReceivedById,
-        string ReceivedByName,
-        string? Notes,
-        DateTime CreatedAt);
+    private sealed class ReceiptRow
+    {
+        public Guid Id { get; init; }
+        public string ReceiptNumber { get; init; } = string.Empty;
+        public Guid AcademicYearId { get; init; }
+        public string AcademicYearName { get; init; } = string.Empty;
+        public Guid StudentId { get; init; }
+        public string StudentName { get; init; } = string.Empty;
+        public string StudentNis { get; init; } = string.Empty;
+        public Guid? StudyGroupId { get; init; }
+        public string? StudyGroupName { get; init; }
+        public DateTime PaymentDate { get; init; }
+        public string PaymentMethod { get; init; } = string.Empty;
+        public string? BankReference { get; init; }
+        public decimal TotalAmount { get; init; }
+        public decimal AllocatedAmount { get; init; }
+        public decimal UnallocatedAmount { get; init; }
+        public Guid ReceivedById { get; init; }
+        public string ReceivedByName { get; init; } = string.Empty;
+        public string? Notes { get; init; }
+        public DateTime CreatedAt { get; init; }
+    }
 
     private sealed record AllocationRow(
         Guid Id,

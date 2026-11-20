@@ -63,6 +63,7 @@ public static class RolePermissionCatalog
                 Permissions.Academic.ReportCards.Remarks,
                 Permissions.Academic.ReportCards.Finalize,
                 Permissions.Academic.ReportCards.Override,
+                Permissions.Academic.Monitoring.View,
                 Permissions.Development.Extracurricular.Manage,
                 Permissions.Development.Discipline.Record,
                 Permissions.Development.Achievements.Record,
@@ -89,6 +90,7 @@ public static class RolePermissionCatalog
                 Permissions.Academic.Attendance.View,
                 Permissions.Academic.Scorebook.View,
                 Permissions.Academic.ReportCards.View,
+                Permissions.Academic.Monitoring.View,
                 Permissions.Development.Discipline.Escalate,
                 Permissions.Development.Dossier.View,
                 Permissions.Finance.Reports.View
@@ -147,8 +149,20 @@ public static class RolePermissionCatalog
                 Permissions.Finance.Statements.View,
                 Permissions.Finance.Reports.View
             ],
-            [Roles.Parent] = [],
-            [Roles.Student] = []
+            [Roles.Parent] =
+            [
+                Permissions.Operations.Calendar.View,
+                Permissions.Operations.Announcements.View,
+                Permissions.Students.Children.View,
+                Permissions.Academic.ReportCards.View,
+                Permissions.Finance.Statements.View
+            ],
+            [Roles.Student] =
+            [
+                Permissions.Operations.Timetables.ViewOwn,
+                Permissions.Operations.Calendar.View,
+                Permissions.Operations.Announcements.View
+            ]
         };
 
     public static IReadOnlyList<string> GetPermissionsForRole(string roleCode)

@@ -615,4 +615,67 @@ describe('ReceivablesAgingView (SCR-FIN-RECEIVABLES)', () => {
     expect(filteredText).toContain('KWT-202607-0002');
     expect(filteredText).not.toContain('KWT-202607-0001');
   });
+
+  it('filters aged arrears by study group (UC-FIN-09)', async () => {
+    const agingCalls: string[] = [];
+    setupDefaultMsw({
+      onAgingRequest: (params) => {
+        agingCalls.push(params.toString());
+      }
+    });
+
+    const wrapper = mountView();
+    await flushPromises();
+
+    // Select Study Group = 10A (STUDY_GROUP_10A_ID)
+    const studyGroupSelect = wrapper
+      .findAllComponents(Select)
+      .find((s) => s.attributes('data-testid') === 'filter-study-group');
+    expect(studyGroupSelect).toBeDefined();
+    studyGroupSelect!.vm.$emit('update:modelValue', STUDY_GROUP_10A_ID);
+    await flushPromises();
+
+    expect(agingCalls.some((q) => q.includes(`studyGroupId=${STUDY_GROUP_10A_ID}`))).toBe(true);
+    const tableText = wrapper.find('[data-testid="receivables-aging-table"]').text();
+    expect(tableText).toContain('Budi Santoso');
+    expect(tableText).toContain('10A');
+    expect(tableText).not.toContain('Siti Nurhaliza');
+  });
+
+  it('verifies executive leadership governance: Principal without cashier write permissions can inspect all KPI cards, tables, and daily cashier tabs without write mutations or unauthorized errors', async () => {
+    const wrapper = mountView({
+      roles: ['PRINCIPAL'],
+      permissions: ['Permissions.Finance.Reports.View'] // strictly lacks Permissions.Finance.Payments.Record
+    });
+    await flushPromises();
+
+    // 1. Top KPI cards rendered and populated (UC-ADM-26)
+    expect(wrapper.find('[data-testid="kpi-total-billed"]').text()).toContain('5.000.000');
+    expect(wrapper.find('[data-testid="kpi-total-collected"]').text()).toContain('3.250.000');
+    expect(wrapper.find('[data-testid="kpi-total-outstanding"]').text()).toContain('1.750.000');
+    expect(wrapper.find('[data-testid="kpi-arrears-over-30"]').text()).toContain('950.000');
+
+    // 2. Study group arrears table displays delinquent students and overdue totals (UC-FIN-09)
+    const table = wrapper.find('[data-testid="receivables-aging-table"]');
+    expect(table.exists()).toBe(true);
+    expect(table.text()).toContain('Siti Nurhaliza');
+    expect(table.text()).toContain('Budi Santoso');
+
+    // 3. Confirm zero cashier write mutation actions exist (no "Record Payment", "Add Charge", "New Receipt" buttons)
+    expect(wrapper.find('button[data-testid="record-payment-btn"]').exists()).toBe(false);
+    expect(wrapper.find('button[data-testid="create-charge-btn"]').exists()).toBe(false);
+    expect(wrapper.text()).not.toContain('Record Payment');
+    expect(wrapper.text()).not.toContain('Create Charge');
+
+    // 4. Switch to Daily Cashier tab (UC-PRC-06)
+    await wrapper.find('[data-testid="tab-daily-cashier"]').trigger('click');
+    await flushPromises();
+
+    // Confirm cashier collection register and deposit liabilities are visible for auditing
+    expect(wrapper.find('[data-testid="kpi-cash-collections"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="kpi-bank-collections"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="kpi-deposits-held"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="daily-cashier-table"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="cashier-error-banner"]').exists()).toBe(false);
+  });
 });

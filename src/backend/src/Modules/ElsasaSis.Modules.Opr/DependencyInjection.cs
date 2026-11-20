@@ -19,6 +19,7 @@ using ElsasaSis.Modules.Opr.Features.Rooms.CreateRoom;
 using ElsasaSis.Modules.Opr.Features.Rooms.GetRooms;
 using ElsasaSis.Modules.Opr.Features.Rooms.UpdateRoom;
 using ElsasaSis.Modules.Opr.Features.Timetables.ConfigureStudyGroupTimetable;
+using ElsasaSis.Modules.Opr.Features.Timetables.GetPersonalStudentTimetable;
 using ElsasaSis.Modules.Opr.Features.Timetables.GetStudyGroupTimetable;
 using ElsasaSis.Modules.Opr.Features.Timetables.GetTeacherPersonalSchedule;
 using ElsasaSis.Modules.Opr.Features.Timetables.ManageSmkBlockRotations;
@@ -70,6 +71,7 @@ public static class DependencyInjection
         services.AddScoped<GetSmkBlocksHandler>();
         services.AddScoped<GetStudyGroupTimetableHandler>();
         services.AddScoped<GetTeacherPersonalScheduleHandler>();
+        services.AddScoped<GetPersonalStudentTimetableHandler>();
 
         services.AddScoped<IValidator<CreateAcademicYearRequest>, CreateAcademicYearValidator>();
         services.AddScoped<IValidator<UpdateAcademicYearRequest>, UpdateAcademicYearValidator>();

@@ -28,6 +28,11 @@ public static class Permissions
         {
             public const string ViewOwn = "Permissions.Students.Roster.ViewOwn";
         }
+
+        public static class Children
+        {
+            public const string View = "Permissions.Students.Children.View";
+        }
     }
 }
 

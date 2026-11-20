@@ -37,6 +37,16 @@ function createTestRouter() {
         path: '/custom-redirect',
         name: 'custom.redirect',
         component: DummyView
+      },
+      {
+        path: '/portal/parent',
+        name: 'portal.parent',
+        component: DummyView
+      },
+      {
+        path: '/portal/student',
+        name: 'portal.student',
+        component: DummyView
       }
     ]
   });
@@ -178,6 +188,68 @@ describe('LoginView.vue (SCR-AUTH-LOGIN)', () => {
 
     await vi.waitFor(() => {
       expect(router.currentRoute.value.path).toBe('/custom-redirect');
+    });
+  });
+
+  it('signs in successfully as PARENT and redirects to /portal/parent', async () => {
+    server.use(
+      http.post('/api/auth/login', () =>
+        HttpResponse.json({
+          accessToken: 'jwt-token-parent',
+          expiresAt: '2026-11-18T17:00:00Z',
+          user: {
+            id: '01900000-0000-7000-8000-000000000002',
+            username: 'parent.hendra',
+            displayName: 'Hendra Dahlan',
+            roles: ['PARENT'],
+            permissions: ['Permissions.Students.Children.View']
+          }
+        })
+      )
+    );
+
+    const { wrapper, router, getCapturedSession } = await mountLoginView();
+
+    await wrapper.find('#username').setValue('parent.hendra');
+    await wrapper.find('#password').setValue('Password123!');
+    await wrapper.find('form').trigger('submit');
+
+    await vi.waitFor(() => {
+      const session = getCapturedSession();
+      expect(session).not.toBeNull();
+      expect(session?.user.roles).toContain('PARENT');
+      expect(router.currentRoute.value.path).toBe('/portal/parent');
+    });
+  });
+
+  it('signs in successfully as STUDENT and redirects to /portal/student', async () => {
+    server.use(
+      http.post('/api/auth/login', () =>
+        HttpResponse.json({
+          accessToken: 'jwt-token-student',
+          expiresAt: '2026-11-18T17:00:00Z',
+          user: {
+            id: '01900000-0000-7000-8000-000000000003',
+            username: 'student.ahmad',
+            displayName: 'Ahmad Dahlan',
+            roles: ['STUDENT'],
+            permissions: ['Permissions.Operations.Timetables.ViewOwn']
+          }
+        })
+      )
+    );
+
+    const { wrapper, router, getCapturedSession } = await mountLoginView();
+
+    await wrapper.find('#username').setValue('student.ahmad');
+    await wrapper.find('#password').setValue('Password123!');
+    await wrapper.find('form').trigger('submit');
+
+    await vi.waitFor(() => {
+      const session = getCapturedSession();
+      expect(session).not.toBeNull();
+      expect(session?.user.roles).toContain('STUDENT');
+      expect(router.currentRoute.value.path).toBe('/portal/student');
     });
   });
 

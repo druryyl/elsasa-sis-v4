@@ -78,6 +78,55 @@ public sealed class LayerAndCqrsArchitectureTests
     }
 
     [Fact]
+    public void Stage4ReadSliceHandlers_ShouldNotDependOn_WriteRepositories()
+    {
+        Assembly[] allModuleAssemblies =
+        [
+            AssemblyArchitectureContext.AuthModuleAssembly,
+            AssemblyArchitectureContext.OprModuleAssembly,
+            AssemblyArchitectureContext.StdModuleAssembly,
+            AssemblyArchitectureContext.TchModuleAssembly,
+            AssemblyArchitectureContext.AcdModuleAssembly,
+            AssemblyArchitectureContext.FinModuleAssembly,
+            AssemblyArchitectureContext.DevModuleAssembly
+        ];
+
+        var repositoryTypes = Types.InAssemblies(allModuleAssemblies)
+            .That()
+            .HaveNameEndingWith("Repository")
+            .GetTypes()
+            .Select(t => t.FullName!)
+            .Where(name => !string.IsNullOrEmpty(name))
+            .ToArray();
+
+        Assert.NotEmpty(repositoryTypes);
+
+        Type[] stage4ReadSliceHandlers =
+        [
+            typeof(Modules.Std.Features.Students.GetMyChildren.GetMyChildrenHandler),
+            typeof(Modules.Opr.Features.Timetables.GetPersonalStudentTimetable.GetPersonalStudentTimetableHandler),
+            typeof(Modules.Opr.Features.Announcements.GetAnnouncements.GetAnnouncementsHandler),
+            typeof(Modules.Acd.Features.Monitoring.GetAcademicMonitoringProgress.GetAcademicMonitoringProgressHandler),
+            typeof(Modules.Acd.Features.ReportCards.GetStudentReportCards.GetStudentReportCardsHandler),
+            typeof(Modules.Acd.Features.ReportCards.GetReportCardById.GetReportCardByIdHandler),
+            typeof(Modules.Fin.Features.Payments.GetStudentStatement.GetStudentStatementHandler),
+            typeof(Modules.Fin.Features.Payments.GetPaymentReceiptById.GetPaymentReceiptByIdHandler)
+        ];
+
+        foreach (var handlerType in stage4ReadSliceHandlers)
+        {
+            var result = Types.InAssembly(handlerType.Assembly)
+                .That()
+                .HaveName(handlerType.Name)
+                .ShouldNot()
+                .HaveDependencyOnAny(repositoryTypes)
+                .GetResult();
+
+            Assert.True(result.IsSuccessful, $"Stage 4 read handler {handlerType.FullName} must not depend on write repositories.");
+        }
+    }
+
+    [Fact]
     public void AllModuleAssemblies_ShouldNotReference_EntityFrameworkCore()
     {
         Assembly[] moduleAssemblies =

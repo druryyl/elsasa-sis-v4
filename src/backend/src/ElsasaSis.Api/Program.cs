@@ -106,6 +106,12 @@ builder.Services.AddAuthorization(options =>
                     .Any(c => string.Equals(c.Value, permission, StringComparison.Ordinal))));
     }
 
+    options.AddPolicy(ElsasaSis.Modules.Auth.Permissions.Academic.Monitoring.View, policy =>
+        policy.RequireAuthenticatedUser().RequireClaim("permissions", ElsasaSis.Modules.Auth.Permissions.Academic.Monitoring.View));
+
+    options.AddPolicy(ElsasaSis.Modules.Auth.Permissions.Students.Children.View, policy =>
+        policy.RequireAuthenticatedUser().RequireClaim("permissions", ElsasaSis.Modules.Auth.Permissions.Students.Children.View));
+
     static bool HasAnyPermission(AuthorizationHandlerContext ctx, params string[] permissions) =>
         ctx.User.Claims
             .Where(c => c.Type == "permissions")

@@ -35,6 +35,14 @@ export function authNavigationGuard(
   }
 
   if (to.meta.guestOnly && authStore.isAuthenticated) {
+    if (authStore.hasAnyRole(['PARENT'])) {
+      next({ name: 'portal.parent' });
+      return;
+    }
+    if (authStore.hasAnyRole(['STUDENT'])) {
+      next({ name: 'portal.student' });
+      return;
+    }
     next({ name: 'operations.calendar' });
     return;
   }

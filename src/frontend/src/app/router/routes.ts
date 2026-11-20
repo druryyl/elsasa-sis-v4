@@ -1,4 +1,6 @@
 import type { RouteRecordRaw } from 'vue-router';
+import { getActivePinia } from 'pinia';
+import { useAuthStore } from '@/app/stores/auth.store';
 
 declare module 'vue-router' {
   interface RouteMeta {
@@ -6,13 +8,25 @@ declare module 'vue-router' {
     guestOnly?: boolean;
     permission?: string | string[];
     title?: string;
+    layout?: string;
   }
 }
 
 export const routes: RouteRecordRaw[] = [
   {
     path: '/',
-    redirect: '/operations/calendar'
+    redirect: () => {
+      if (getActivePinia()) {
+        const authStore = useAuthStore();
+        if (authStore.hasAnyRole(['PARENT'])) {
+          return '/portal/parent';
+        }
+        if (authStore.hasAnyRole(['STUDENT'])) {
+          return '/portal/student';
+        }
+      }
+      return '/operations/calendar';
+    }
   },
   {
     path: '/login',
@@ -21,6 +35,47 @@ export const routes: RouteRecordRaw[] = [
   {
     path: '/teaching/assignments',
     redirect: '/teachers/assignments'
+  },
+  {
+    path: '/portal',
+    component: () => import('@/app/layouts/PortalLayout.vue'),
+    meta: { requiresAuth: true, layout: 'portal' },
+    children: [
+      {
+        path: '',
+        redirect: () => {
+          if (getActivePinia()) {
+            const authStore = useAuthStore();
+            if (authStore.hasAnyRole(['STUDENT'])) {
+              return '/portal/student';
+            }
+          }
+          return '/portal/parent';
+        }
+      },
+      {
+        path: 'parent',
+        name: 'portal.parent',
+        component: () => import('@/features/portal-parent/views/ParentPortalView.vue'),
+        meta: {
+          requiresAuth: true,
+          permission: 'Permissions.Students.Children.View',
+          layout: 'portal',
+          title: 'Portal Orang Tua'
+        }
+      },
+      {
+        path: 'student',
+        name: 'portal.student',
+        component: () => import('@/features/portal-student/views/StudentPortalView.vue'),
+        meta: {
+          requiresAuth: true,
+          permission: 'Permissions.Operations.Timetables.ViewOwn',
+          layout: 'portal',
+          title: 'Portal Siswa'
+        }
+      }
+    ]
   },
   {
     path: '/auth',
@@ -153,6 +208,18 @@ export const routes: RouteRecordRaw[] = [
                 'Permissions.Academic.ReportCards.Finalize'
               ],
               title: 'Semester Report Cards'
+            }
+          },
+          {
+            path: 'monitoring',
+            name: 'academic.monitoring',
+            component: () =>
+              import('@/features/academic/monitoring/views/AcademicMonitoringView.vue'),
+            meta: {
+              requiresAuth: true,
+              permission: 'Permissions.Academic.Monitoring.View',
+              layout: 'app',
+              title: 'Monitoring Progres Akademik'
             }
           }
         ]
