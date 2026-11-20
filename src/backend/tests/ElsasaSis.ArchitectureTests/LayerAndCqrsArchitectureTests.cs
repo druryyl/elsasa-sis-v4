@@ -11,7 +11,8 @@ public sealed class LayerAndCqrsArchitectureTests
         { AssemblyArchitectureContext.AuthModuleAssembly, "ElsasaSis.Modules.Auth" },
         { AssemblyArchitectureContext.OprModuleAssembly, "ElsasaSis.Modules.Opr" },
         { AssemblyArchitectureContext.StdModuleAssembly, "ElsasaSis.Modules.Std" },
-        { AssemblyArchitectureContext.TchModuleAssembly, "ElsasaSis.Modules.Tch" }
+        { AssemblyArchitectureContext.TchModuleAssembly, "ElsasaSis.Modules.Tch" },
+        { AssemblyArchitectureContext.AcdModuleAssembly, "ElsasaSis.Modules.Acd" }
     };
 
     [Theory]
@@ -48,7 +49,8 @@ public sealed class LayerAndCqrsArchitectureTests
             AssemblyArchitectureContext.AuthModuleAssembly,
             AssemblyArchitectureContext.OprModuleAssembly,
             AssemblyArchitectureContext.StdModuleAssembly,
-            AssemblyArchitectureContext.TchModuleAssembly
+            AssemblyArchitectureContext.TchModuleAssembly,
+            AssemblyArchitectureContext.AcdModuleAssembly
         ];
 
         var writeHandlers = Types.InAssemblies(moduleAssemblies)

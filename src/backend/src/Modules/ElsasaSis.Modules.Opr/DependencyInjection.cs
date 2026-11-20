@@ -18,6 +18,10 @@ using ElsasaSis.Modules.Opr.Features.CalendarEntries.UpdateCalendarEntry;
 using ElsasaSis.Modules.Opr.Features.Rooms.CreateRoom;
 using ElsasaSis.Modules.Opr.Features.Rooms.GetRooms;
 using ElsasaSis.Modules.Opr.Features.Rooms.UpdateRoom;
+using ElsasaSis.Modules.Opr.Features.Timetables.ConfigureStudyGroupTimetable;
+using ElsasaSis.Modules.Opr.Features.Timetables.GetStudyGroupTimetable;
+using ElsasaSis.Modules.Opr.Features.Timetables.GetTeacherPersonalSchedule;
+using ElsasaSis.Modules.Opr.Features.Timetables.ManageSmkBlockRotations;
 using ElsasaSis.Modules.Opr.Infrastructure.Contracts;
 using ElsasaSis.Modules.Opr.Infrastructure.Persistence;
 using FluentValidation;
@@ -33,6 +37,8 @@ public static class DependencyInjection
         services.AddScoped<ICalendarEntryRepository, CalendarEntryRepository>();
         services.AddScoped<IRoomRepository, RoomRepository>();
         services.AddScoped<IAnnouncementRepository, AnnouncementRepository>();
+        services.AddScoped<IStudyGroupScheduleRepository, StudyGroupScheduleRepository>();
+        services.AddScoped<IStudyGroupTimetableRepository, StudyGroupTimetableRepository>();
         services.AddScoped<IOperationalContract, OperationalContract>();
 
         services.AddScoped<GetAcademicYearsHandler>();
@@ -57,6 +63,14 @@ public static class DependencyInjection
         services.AddScoped<UpdateAnnouncementHandler>();
         services.AddScoped<PublishAnnouncementHandler>();
 
+        services.AddScoped<ConfigureStudyGroupTimetableHandler>();
+        services.AddScoped<DeleteStudyGroupTimetableSlotHandler>();
+        services.AddScoped<CreateSmkBlockHandler>();
+        services.AddScoped<DeleteSmkBlockHandler>();
+        services.AddScoped<GetSmkBlocksHandler>();
+        services.AddScoped<GetStudyGroupTimetableHandler>();
+        services.AddScoped<GetTeacherPersonalScheduleHandler>();
+
         services.AddScoped<IValidator<CreateAcademicYearRequest>, CreateAcademicYearValidator>();
         services.AddScoped<IValidator<UpdateAcademicYearRequest>, UpdateAcademicYearValidator>();
         services.AddScoped<IValidator<CreateCalendarEntryRequest>, CreateCalendarEntryValidator>();
@@ -65,6 +79,8 @@ public static class DependencyInjection
         services.AddScoped<IValidator<UpdateRoomRequest>, UpdateRoomValidator>();
         services.AddScoped<IValidator<CreateAnnouncementRequest>, CreateAnnouncementValidator>();
         services.AddScoped<IValidator<UpdateAnnouncementRequest>, UpdateAnnouncementValidator>();
+        services.AddScoped<IValidator<ConfigureStudyGroupTimetableRequest>, ConfigureStudyGroupTimetableValidator>();
+        services.AddScoped<IValidator<CreateSmkBlockRequest>, CreateSmkBlockValidator>();
 
         return services;
     }

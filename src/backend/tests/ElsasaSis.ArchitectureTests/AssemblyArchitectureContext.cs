@@ -1,5 +1,6 @@
 using System.Reflection;
 using ElsasaSis.Contracts.Operational;
+using ElsasaSis.Modules.Acd;
 using ElsasaSis.Modules.Auth;
 using ElsasaSis.Modules.Opr;
 using ElsasaSis.Modules.Std;
@@ -16,6 +17,7 @@ internal static class AssemblyArchitectureContext
     internal static readonly Assembly OprModuleAssembly = typeof(OprAssemblyMarker).Assembly;
     internal static readonly Assembly StdModuleAssembly = typeof(StdAssemblyMarker).Assembly;
     internal static readonly Assembly TchModuleAssembly = typeof(TchAssemblyMarker).Assembly;
+    internal static readonly Assembly AcdModuleAssembly = typeof(AcdAssemblyMarker).Assembly;
     internal static readonly Assembly ApiAssembly = typeof(Program).Assembly;
     internal static readonly Assembly DatabaseAssembly = Assembly.Load("ElsasaSis.Database");
 
@@ -27,6 +29,7 @@ internal static class AssemblyArchitectureContext
         OprModuleAssembly,
         StdModuleAssembly,
         TchModuleAssembly,
+        AcdModuleAssembly,
         ApiAssembly,
         DatabaseAssembly
     ];

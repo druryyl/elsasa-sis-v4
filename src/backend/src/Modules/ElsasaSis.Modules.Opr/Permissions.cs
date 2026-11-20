@@ -22,6 +22,13 @@ public static class Permissions
             public const string Create = "Permissions.Operations.Announcements.Create";
             public const string Publish = "Permissions.Operations.Announcements.Publish";
         }
+
+        public static class Timetables
+        {
+            public const string View = "Permissions.Operations.Timetables.View";
+            public const string Manage = "Permissions.Operations.Timetables.Manage";
+            public const string ViewOwn = "Permissions.Operations.Timetables.ViewOwn";
+        }
     }
 }
 
@@ -42,6 +49,11 @@ public static class Policies
         public static class Announcements
         {
             public const string ViewOrManage = "Policies.Operations.Announcements.ViewOrManage";
+        }
+
+        public static class Timetables
+        {
+            public const string ViewOrManageOrOwn = "Policies.Operations.Timetables.ViewOrManageOrOwn";
         }
     }
 }

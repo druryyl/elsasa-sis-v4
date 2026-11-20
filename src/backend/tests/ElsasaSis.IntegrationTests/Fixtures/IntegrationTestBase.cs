@@ -62,6 +62,11 @@ public abstract class IntegrationTestBase : IAsyncLifetime
         await Stage1Seeder.SeedRoleAccountsAndFixturesAsync(Factory.ConnectionString, cancellationToken);
     }
 
+    protected async Task SeedStage2FixturesAsync(CancellationToken cancellationToken = default)
+    {
+        await Factory.SeedStage2FixturesAsync(cancellationToken);
+    }
+
     protected static async Task<JsonElement> ReadJsonAsync(HttpResponseMessage response)
     {
         var content = await response.Content.ReadAsStringAsync();

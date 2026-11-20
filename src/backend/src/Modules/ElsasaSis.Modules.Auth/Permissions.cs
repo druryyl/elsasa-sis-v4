@@ -22,6 +22,34 @@ public static class Permissions
             public const string Create = "Permissions.Operations.Announcements.Create";
             public const string Publish = "Permissions.Operations.Announcements.Publish";
         }
+
+        public static class Timetables
+        {
+            public const string View = "Permissions.Operations.Timetables.View";
+            public const string Manage = "Permissions.Operations.Timetables.Manage";
+            public const string ViewOwn = "Permissions.Operations.Timetables.ViewOwn";
+        }
+    }
+
+    public static class Academic
+    {
+        public static class Curriculum
+        {
+            public const string View = "Permissions.Academic.Curriculum.View";
+            public const string Manage = "Permissions.Academic.Curriculum.Manage";
+        }
+
+        public static class Attendance
+        {
+            public const string View = "Permissions.Academic.Attendance.View";
+            public const string Record = "Permissions.Academic.Attendance.Record";
+        }
+
+        public static class Scorebook
+        {
+            public const string View = "Permissions.Academic.Scorebook.View";
+            public const string Manage = "Permissions.Academic.Scorebook.Manage";
+        }
     }
 
     public static class Students
@@ -94,7 +122,16 @@ public static class Permissions
         Teaching.Capabilities.Manage,
         Teaching.Assignments.View,
         Teaching.Assignments.Manage,
-        Teaching.Assignments.Oversight
+        Teaching.Assignments.Oversight,
+        Operations.Timetables.View,
+        Operations.Timetables.Manage,
+        Operations.Timetables.ViewOwn,
+        Academic.Curriculum.View,
+        Academic.Curriculum.Manage,
+        Academic.Attendance.View,
+        Academic.Attendance.Record,
+        Academic.Scorebook.View,
+        Academic.Scorebook.Manage
     ];
 }
 
@@ -115,6 +152,29 @@ public static class Policies
         public static class Announcements
         {
             public const string ViewOrManage = "Policies.Operations.Announcements.ViewOrManage";
+        }
+
+        public static class Timetables
+        {
+            public const string ViewOrManageOrOwn = "Policies.Operations.Timetables.ViewOrManageOrOwn";
+        }
+    }
+
+    public static class Academic
+    {
+        public static class Curriculum
+        {
+            public const string ViewOrManage = "Policies.Academic.Curriculum.ViewOrManage";
+        }
+
+        public static class Attendance
+        {
+            public const string ViewOrRecord = "Policies.Academic.Attendance.ViewOrRecord";
+        }
+
+        public static class Scorebook
+        {
+            public const string ViewOrManage = "Policies.Academic.Scorebook.ViewOrManage";
         }
     }
 

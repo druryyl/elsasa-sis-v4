@@ -75,6 +75,68 @@ export const routes: RouteRecordRaw[] = [
               ],
               title: 'School Announcements & Bulletin'
             }
+          },
+          {
+            path: 'timetables',
+            name: 'operations.timetables',
+            component: () =>
+              import('@/features/operations/scheduling/views/TimetableWorkspaceView.vue'),
+            meta: {
+              requiresAuth: true,
+              permission: [
+                'Permissions.Operations.Timetables.View',
+                'Permissions.Operations.Timetables.Manage',
+                'Permissions.Operations.Timetables.ViewOwn'
+              ],
+              title: 'Timetables & Scheduling'
+            }
+          }
+        ]
+      },
+      {
+        path: 'academic',
+        children: [
+          {
+            path: 'curriculum',
+            name: 'academic.curriculum',
+            component: () =>
+              import('@/features/academic/curriculum/views/CurriculumSetupView.vue'),
+            meta: {
+              requiresAuth: true,
+              permission: [
+                'Permissions.Academic.Curriculum.View',
+                'Permissions.Academic.Curriculum.Manage'
+              ],
+              title: 'Curriculum & Learning Structure'
+            }
+          },
+          {
+            path: 'attendance',
+            name: 'academic.attendance',
+            component: () =>
+              import('@/features/academic/attendance/views/AttendanceWorkbenchView.vue'),
+            meta: {
+              requiresAuth: true,
+              permission: [
+                'Permissions.Academic.Attendance.View',
+                'Permissions.Academic.Attendance.Record'
+              ],
+              title: 'Classroom Attendance'
+            }
+          },
+          {
+            path: 'scorebook',
+            name: 'academic.scorebook',
+            component: () =>
+              import('@/features/academic/scorebook/views/ScorebookWorkbenchView.vue'),
+            meta: {
+              requiresAuth: true,
+              permission: [
+                'Permissions.Academic.Scorebook.View',
+                'Permissions.Academic.Scorebook.Manage'
+              ],
+              title: 'Teacher Scorebook'
+            }
           }
         ]
       },

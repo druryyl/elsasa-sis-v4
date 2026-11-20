@@ -162,6 +162,26 @@ async function mountAppLayout(user: AuthUser = ROLE_USERS.SCHOOL_ADMIN!) {
         component: DummyView
       },
       {
+        path: '/operations/timetables',
+        name: 'operations.timetables',
+        component: DummyView
+      },
+      {
+        path: '/academic/curriculum',
+        name: 'academic.curriculum',
+        component: DummyView
+      },
+      {
+        path: '/academic/attendance',
+        name: 'academic.attendance',
+        component: DummyView
+      },
+      {
+        path: '/academic/scorebook',
+        name: 'academic.scorebook',
+        component: DummyView
+      },
+      {
         path: '/auth/login',
         name: 'auth.login',
         component: DummyView
@@ -443,5 +463,43 @@ describe('AppLayout.vue Role-Filtered Navigation Taxonomy', () => {
       'Announcements & Bulletin'
     ]);
     expect(wrapper.find('[data-testid="nav-item-admissions.queue"]').exists()).toBe(false);
+  });
+
+  it('renders Stage 2 navigation items when user holds Stage 2 permissions', async () => {
+    mockAcademicYearsEndpoint();
+    const stage2User: AuthUser = {
+      ...ROLE_USERS.SCHOOL_ADMIN!,
+      permissions: [
+        ...ROLE_USERS.SCHOOL_ADMIN!.permissions,
+        'Permissions.Operations.Timetables.View',
+        'Permissions.Academic.Curriculum.View',
+        'Permissions.Academic.Attendance.View',
+        'Permissions.Academic.Scorebook.View'
+      ]
+    };
+    const { wrapper } = await mountAppLayout(stage2User);
+
+    expect(getVisibleGroupHeaders(wrapper)).toEqual([
+      'Admissions',
+      'Students & Classes',
+      'Faculty & Teaching',
+      'Academic & Curriculum',
+      'Operations & Comms'
+    ]);
+    expect(getVisibleNavLabels(wrapper)).toEqual([
+      'Admissions Queue',
+      'Student Directory & Placements',
+      'Teachers & Assignments',
+      'Classroom Attendance',
+      'Teacher Scorebook',
+      'Curriculum & Learning Structure',
+      'School Calendar & Academic Cycle',
+      'Timetables & Scheduling',
+      'Announcements & Bulletin'
+    ]);
+    expect(wrapper.find('[data-testid="nav-item-operations.timetables"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="nav-item-academic.curriculum"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="nav-item-academic.attendance"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="nav-item-academic.scorebook"]').exists()).toBe(true);
   });
 });

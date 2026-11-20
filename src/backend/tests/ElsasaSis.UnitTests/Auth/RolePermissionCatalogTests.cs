@@ -1,4 +1,6 @@
 using ElsasaSis.Modules.Auth;
+using AcdPermissions = ElsasaSis.Modules.Acd.Permissions;
+using AcdPolicies = ElsasaSis.Modules.Acd.Policies;
 using OprPermissions = ElsasaSis.Modules.Opr.Permissions;
 using OprPolicies = ElsasaSis.Modules.Opr.Policies;
 using StdPermissions = ElsasaSis.Modules.Std.Permissions;
@@ -29,7 +31,7 @@ public sealed class RolePermissionCatalogTests
     }
 
     [Fact]
-    public void SchoolAdmin_ReceivesAllStage1AdminPermissions()
+    public void SchoolAdmin_ReceivesAllStage2AdminPermissions()
     {
         string[] expected =
         [
@@ -51,7 +53,16 @@ public sealed class RolePermissionCatalogTests
             Permissions.Teaching.Capabilities.Manage,
             Permissions.Teaching.Assignments.View,
             Permissions.Teaching.Assignments.Manage,
-            Permissions.Teaching.Assignments.Oversight
+            Permissions.Teaching.Assignments.Oversight,
+            Permissions.Operations.Timetables.View,
+            Permissions.Operations.Timetables.Manage,
+            Permissions.Operations.Timetables.ViewOwn,
+            Permissions.Academic.Curriculum.View,
+            Permissions.Academic.Curriculum.Manage,
+            Permissions.Academic.Attendance.View,
+            Permissions.Academic.Attendance.Record,
+            Permissions.Academic.Scorebook.View,
+            Permissions.Academic.Scorebook.Manage
         ];
 
         var actual = RolePermissionCatalog.GetPermissionsForRole(RolePermissionCatalog.Roles.SchoolAdmin);
@@ -62,7 +73,7 @@ public sealed class RolePermissionCatalogTests
     }
 
     [Fact]
-    public void Principal_ReceivesExpectedStage1Permissions()
+    public void Principal_ReceivesExpectedStage2Permissions()
     {
         string[] expected =
         [
@@ -73,7 +84,11 @@ public sealed class RolePermissionCatalogTests
             Permissions.Students.Admissions.Approve,
             Permissions.Students.Directory.View,
             Permissions.Teaching.Assignments.View,
-            Permissions.Teaching.Assignments.Oversight
+            Permissions.Teaching.Assignments.Oversight,
+            Permissions.Operations.Timetables.View,
+            Permissions.Academic.Curriculum.View,
+            Permissions.Academic.Attendance.View,
+            Permissions.Academic.Scorebook.View
         ];
 
         var actual = RolePermissionCatalog.GetPermissionsForRole(RolePermissionCatalog.Roles.Principal);
@@ -82,13 +97,19 @@ public sealed class RolePermissionCatalogTests
     }
 
     [Fact]
-    public void Teacher_ReceivesExpectedStage1Permissions()
+    public void Teacher_ReceivesExpectedStage2Permissions()
     {
         string[] expected =
         [
             Permissions.Operations.Calendar.View,
             Permissions.Operations.Announcements.View,
-            Permissions.Teaching.Assignments.View
+            Permissions.Teaching.Assignments.View,
+            Permissions.Operations.Timetables.ViewOwn,
+            Permissions.Academic.Curriculum.View,
+            Permissions.Academic.Attendance.View,
+            Permissions.Academic.Attendance.Record,
+            Permissions.Academic.Scorebook.View,
+            Permissions.Academic.Scorebook.Manage
         ];
 
         var actual = RolePermissionCatalog.GetPermissionsForRole(RolePermissionCatalog.Roles.Teacher);
@@ -97,12 +118,19 @@ public sealed class RolePermissionCatalogTests
     }
 
     [Fact]
-    public void HomeroomTeacher_ReceivesExpectedStage1Permissions()
+    public void HomeroomTeacher_ReceivesExpectedStage2Permissions()
     {
         string[] expected =
         [
             Permissions.Operations.Calendar.View,
             Permissions.Operations.Announcements.View,
+            Permissions.Teaching.Assignments.View,
+            Permissions.Operations.Timetables.ViewOwn,
+            Permissions.Academic.Curriculum.View,
+            Permissions.Academic.Attendance.View,
+            Permissions.Academic.Attendance.Record,
+            Permissions.Academic.Scorebook.View,
+            Permissions.Academic.Scorebook.Manage,
             Permissions.Students.Roster.ViewOwn
         ];
 
@@ -144,12 +172,14 @@ public sealed class RolePermissionCatalogTests
             RolePermissionCatalog.Roles.Principal
         ]);
 
-        Assert.Equal(20, adminAndPrincipal.Count);
+        Assert.Equal(29, adminAndPrincipal.Count);
         Assert.Equal(
             adminAndPrincipal.OrderBy(p => p, StringComparer.Ordinal),
             adminAndPrincipal);
         Assert.Contains(Permissions.Operations.Calendar.Manage, adminAndPrincipal);
         Assert.Contains(Permissions.Students.Admissions.Approve, adminAndPrincipal);
+        Assert.Contains(Permissions.Operations.Timetables.Manage, adminAndPrincipal);
+        Assert.Contains(Permissions.Academic.Curriculum.Manage, adminAndPrincipal);
 
         var teacherAndHomeroom = RolePermissionCatalog.GetPermissionsForRoles([
             RolePermissionCatalog.Roles.Teacher,
@@ -158,8 +188,14 @@ public sealed class RolePermissionCatalogTests
 
         string[] expectedCombined =
         [
+            Permissions.Academic.Attendance.Record,
+            Permissions.Academic.Attendance.View,
+            Permissions.Academic.Curriculum.View,
+            Permissions.Academic.Scorebook.Manage,
+            Permissions.Academic.Scorebook.View,
             Permissions.Operations.Announcements.View,
             Permissions.Operations.Calendar.View,
+            Permissions.Operations.Timetables.ViewOwn,
             Permissions.Students.Roster.ViewOwn,
             Permissions.Teaching.Assignments.View
         ];
@@ -170,7 +206,7 @@ public sealed class RolePermissionCatalogTests
     [Fact]
     public void ModulePermissionsAndPolicies_MatchAuthCatalogStrings()
     {
-        Assert.Equal(21, Permissions.All.Count);
+        Assert.Equal(30, Permissions.All.Count);
         Assert.Equal(Permissions.All.Distinct(StringComparer.Ordinal).Count(), Permissions.All.Count);
 
         Assert.Equal(Permissions.Operations.Calendar.View, OprPermissions.Operations.Calendar.View);
@@ -180,6 +216,9 @@ public sealed class RolePermissionCatalogTests
         Assert.Equal(Permissions.Operations.Announcements.View, OprPermissions.Operations.Announcements.View);
         Assert.Equal(Permissions.Operations.Announcements.Create, OprPermissions.Operations.Announcements.Create);
         Assert.Equal(Permissions.Operations.Announcements.Publish, OprPermissions.Operations.Announcements.Publish);
+        Assert.Equal(Permissions.Operations.Timetables.View, OprPermissions.Operations.Timetables.View);
+        Assert.Equal(Permissions.Operations.Timetables.Manage, OprPermissions.Operations.Timetables.Manage);
+        Assert.Equal(Permissions.Operations.Timetables.ViewOwn, OprPermissions.Operations.Timetables.ViewOwn);
 
         Assert.Equal(Permissions.Students.Admissions.View, StdPermissions.Students.Admissions.View);
         Assert.Equal(Permissions.Students.Admissions.Register, StdPermissions.Students.Admissions.Register);
@@ -197,12 +236,25 @@ public sealed class RolePermissionCatalogTests
         Assert.Equal(Permissions.Teaching.Assignments.Manage, TchPermissions.Teaching.Assignments.Manage);
         Assert.Equal(Permissions.Teaching.Assignments.Oversight, TchPermissions.Teaching.Assignments.Oversight);
 
+        Assert.Equal(Permissions.Academic.Curriculum.View, AcdPermissions.Academic.Curriculum.View);
+        Assert.Equal(Permissions.Academic.Curriculum.Manage, AcdPermissions.Academic.Curriculum.Manage);
+        Assert.Equal(Permissions.Academic.Attendance.View, AcdPermissions.Academic.Attendance.View);
+        Assert.Equal(Permissions.Academic.Attendance.Record, AcdPermissions.Academic.Attendance.Record);
+        Assert.Equal(Permissions.Academic.Scorebook.View, AcdPermissions.Academic.Scorebook.View);
+        Assert.Equal(Permissions.Academic.Scorebook.Manage, AcdPermissions.Academic.Scorebook.Manage);
+
         Assert.Equal(Policies.Operations.Calendar.ViewOrManage, OprPolicies.Operations.Calendar.ViewOrManage);
         Assert.Equal(Policies.Operations.Rooms.ViewOrManage, OprPolicies.Operations.Rooms.ViewOrManage);
         Assert.Equal(Policies.Operations.Announcements.ViewOrManage, OprPolicies.Operations.Announcements.ViewOrManage);
+        Assert.Equal(Policies.Operations.Timetables.ViewOrManageOrOwn, OprPolicies.Operations.Timetables.ViewOrManageOrOwn);
+
         Assert.Equal(Policies.Students.Admissions.DecideOrApprove, StdPolicies.Students.Admissions.DecideOrApprove);
         Assert.Equal(Policies.Students.DirectoryOrOwnRoster, StdPolicies.Students.DirectoryOrOwnRoster);
         Assert.Equal(Policies.Teaching.Assignments.ViewOrOversight, TchPolicies.Teaching.Assignments.ViewOrOversight);
+
+        Assert.Equal(Policies.Academic.Curriculum.ViewOrManage, AcdPolicies.Academic.Curriculum.ViewOrManage);
+        Assert.Equal(Policies.Academic.Attendance.ViewOrRecord, AcdPolicies.Academic.Attendance.ViewOrRecord);
+        Assert.Equal(Policies.Academic.Scorebook.ViewOrManage, AcdPolicies.Academic.Scorebook.ViewOrManage);
     }
 
     [Fact]

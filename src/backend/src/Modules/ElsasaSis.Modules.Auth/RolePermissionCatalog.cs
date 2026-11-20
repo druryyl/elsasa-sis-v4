@@ -47,7 +47,16 @@ public static class RolePermissionCatalog
                 Permissions.Teaching.Capabilities.Manage,
                 Permissions.Teaching.Assignments.View,
                 Permissions.Teaching.Assignments.Manage,
-                Permissions.Teaching.Assignments.Oversight
+                Permissions.Teaching.Assignments.Oversight,
+                Permissions.Operations.Timetables.View,
+                Permissions.Operations.Timetables.Manage,
+                Permissions.Operations.Timetables.ViewOwn,
+                Permissions.Academic.Curriculum.View,
+                Permissions.Academic.Curriculum.Manage,
+                Permissions.Academic.Attendance.View,
+                Permissions.Academic.Attendance.Record,
+                Permissions.Academic.Scorebook.View,
+                Permissions.Academic.Scorebook.Manage
             ],
             [Roles.Principal] =
             [
@@ -58,18 +67,35 @@ public static class RolePermissionCatalog
                 Permissions.Students.Admissions.Approve,
                 Permissions.Students.Directory.View,
                 Permissions.Teaching.Assignments.View,
-                Permissions.Teaching.Assignments.Oversight
+                Permissions.Teaching.Assignments.Oversight,
+                Permissions.Operations.Timetables.View,
+                Permissions.Academic.Curriculum.View,
+                Permissions.Academic.Attendance.View,
+                Permissions.Academic.Scorebook.View
             ],
             [Roles.Teacher] =
             [
                 Permissions.Operations.Calendar.View,
                 Permissions.Operations.Announcements.View,
-                Permissions.Teaching.Assignments.View
+                Permissions.Teaching.Assignments.View,
+                Permissions.Operations.Timetables.ViewOwn,
+                Permissions.Academic.Curriculum.View,
+                Permissions.Academic.Attendance.View,
+                Permissions.Academic.Attendance.Record,
+                Permissions.Academic.Scorebook.View,
+                Permissions.Academic.Scorebook.Manage
             ],
             [Roles.HomeroomTeacher] =
             [
                 Permissions.Operations.Calendar.View,
                 Permissions.Operations.Announcements.View,
+                Permissions.Teaching.Assignments.View,
+                Permissions.Operations.Timetables.ViewOwn,
+                Permissions.Academic.Curriculum.View,
+                Permissions.Academic.Attendance.View,
+                Permissions.Academic.Attendance.Record,
+                Permissions.Academic.Scorebook.View,
+                Permissions.Academic.Scorebook.Manage,
                 Permissions.Students.Roster.ViewOwn
             ],
             [Roles.FinanceOfficer] =

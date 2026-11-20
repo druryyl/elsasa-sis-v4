@@ -257,4 +257,109 @@ describe('Router Auth & Permission Guards', () => {
       }
     }
   }, 30_000);
+
+  it('redirects unauthenticated requests across all 4 Stage 2 routes to /auth/login', async () => {
+    const stage2Paths = [
+      '/operations/timetables',
+      '/academic/curriculum',
+      '/academic/attendance',
+      '/academic/scorebook'
+    ];
+
+    for (const path of stage2Paths) {
+      const router = createAppRouter(createMemoryHistory());
+      await router.push(path);
+      await router.isReady();
+
+      expect(router.currentRoute.value.name).toBe('auth.login');
+      expect(router.currentRoute.value.query.redirect).toBe(path);
+    }
+  }, 15_000);
+
+  it('enforces Stage 2 route permissions allowing authorized and blocking unauthorized access', async () => {
+    const stage2Cases: Array<{
+      path: string;
+      name: string;
+      validPermissions: string[];
+      unrelatedPermission: string;
+    }> = [
+      {
+        path: '/operations/timetables',
+        name: 'operations.timetables',
+        validPermissions: [
+          'Permissions.Operations.Timetables.View',
+          'Permissions.Operations.Timetables.Manage',
+          'Permissions.Operations.Timetables.ViewOwn'
+        ],
+        unrelatedPermission: 'Permissions.Operations.Calendar.View'
+      },
+      {
+        path: '/academic/curriculum',
+        name: 'academic.curriculum',
+        validPermissions: [
+          'Permissions.Academic.Curriculum.View',
+          'Permissions.Academic.Curriculum.Manage'
+        ],
+        unrelatedPermission: 'Permissions.Students.Directory.View'
+      },
+      {
+        path: '/academic/attendance',
+        name: 'academic.attendance',
+        validPermissions: [
+          'Permissions.Academic.Attendance.View',
+          'Permissions.Academic.Attendance.Record'
+        ],
+        unrelatedPermission: 'Permissions.Operations.Calendar.View'
+      },
+      {
+        path: '/academic/scorebook',
+        name: 'academic.scorebook',
+        validPermissions: [
+          'Permissions.Academic.Scorebook.View',
+          'Permissions.Academic.Scorebook.Manage'
+        ],
+        unrelatedPermission: 'Permissions.Operations.Calendar.View'
+      }
+    ];
+
+    for (const testCase of stage2Cases) {
+      // 1. Verify access succeeds for each valid permission
+      for (const permission of testCase.validPermissions) {
+        const authStore = useAuthStore();
+        authStore.setSession({
+          accessToken: 'token-stage2',
+          user: {
+            id: 'u-stage2',
+            username: 'stage2.user',
+            displayName: 'Stage 2 User',
+            roles: ['TEACHER'],
+            permissions: [permission]
+          }
+        });
+
+        const router = createAppRouter(createMemoryHistory());
+        await router.push(testCase.path);
+        await router.isReady();
+        expect(router.currentRoute.value.name).toBe(testCase.name);
+      }
+
+      // 2. Verify access blocked when lacking valid permissions
+      const authStore = useAuthStore();
+      authStore.setSession({
+        accessToken: 'token-unauthorized',
+        user: {
+          id: 'u-unauth',
+          username: 'unauth.user',
+          displayName: 'Unauthorized User',
+          roles: ['TEACHER'],
+          permissions: [testCase.unrelatedPermission]
+        }
+      });
+
+      const blockedRouter = createAppRouter(createMemoryHistory());
+      await blockedRouter.push(testCase.path);
+      await blockedRouter.isReady();
+      expect(blockedRouter.currentRoute.value.name).toBe('forbidden');
+    }
+  }, 30_000);
 });

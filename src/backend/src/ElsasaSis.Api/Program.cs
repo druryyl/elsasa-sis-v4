@@ -1,11 +1,11 @@
 using System.Text;
 using ElsasaSis.Api.Extensions;
-using ElsasaSis.Api.Features.Academic.GetSubjects;
 using ElsasaSis.Api.Infrastructure;
 using ElsasaSis.Api.Middleware;
 using ElsasaSis.Api.Security;
 using ElsasaSis.Contracts.Academic;
 using ElsasaSis.Database;
+using ElsasaSis.Modules.Acd;
 using ElsasaSis.Modules.Auth;
 using ElsasaSis.Modules.Auth.Infrastructure;
 using ElsasaSis.Modules.Opr;
@@ -43,15 +43,14 @@ builder.Services.AddMediatR(cfg =>
         typeof(AuthAssemblyMarker).Assembly,
         typeof(OprAssemblyMarker).Assembly,
         typeof(StdAssemblyMarker).Assembly,
-        typeof(TchAssemblyMarker).Assembly));
+        typeof(TchAssemblyMarker).Assembly,
+        typeof(AcdAssemblyMarker).Assembly));
 
 builder.Services.AddAuthModule(builder.Configuration);
 builder.Services.AddOprModule();
 builder.Services.AddStdModule();
 builder.Services.AddTchModule();
-
-builder.Services.AddScoped<IAcademicContract, AcademicContract>();
-builder.Services.AddScoped<GetSubjectsHandler>();
+builder.Services.AddAcdModule();
 
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
     ?? ["http://localhost:5173"];
@@ -138,6 +137,27 @@ builder.Services.AddAuthorization(options =>
             ElsasaSis.Modules.Auth.Permissions.Teaching.Assignments.View,
             ElsasaSis.Modules.Auth.Permissions.Teaching.Assignments.Manage,
             ElsasaSis.Modules.Auth.Permissions.Teaching.Assignments.Oversight)));
+
+    options.AddPolicy(AuthPolicies.Operations.Timetables.ViewOrManageOrOwn, policy =>
+        policy.RequireAssertion(ctx => HasAnyPermission(ctx,
+            ElsasaSis.Modules.Auth.Permissions.Operations.Timetables.View,
+            ElsasaSis.Modules.Auth.Permissions.Operations.Timetables.Manage,
+            ElsasaSis.Modules.Auth.Permissions.Operations.Timetables.ViewOwn)));
+
+    options.AddPolicy(AuthPolicies.Academic.Curriculum.ViewOrManage, policy =>
+        policy.RequireAssertion(ctx => HasAnyPermission(ctx,
+            ElsasaSis.Modules.Auth.Permissions.Academic.Curriculum.View,
+            ElsasaSis.Modules.Auth.Permissions.Academic.Curriculum.Manage)));
+
+    options.AddPolicy(AuthPolicies.Academic.Attendance.ViewOrRecord, policy =>
+        policy.RequireAssertion(ctx => HasAnyPermission(ctx,
+            ElsasaSis.Modules.Auth.Permissions.Academic.Attendance.View,
+            ElsasaSis.Modules.Auth.Permissions.Academic.Attendance.Record)));
+
+    options.AddPolicy(AuthPolicies.Academic.Scorebook.ViewOrManage, policy =>
+        policy.RequireAssertion(ctx => HasAnyPermission(ctx,
+            ElsasaSis.Modules.Auth.Permissions.Academic.Scorebook.View,
+            ElsasaSis.Modules.Auth.Permissions.Academic.Scorebook.Manage)));
 });
 
 builder.Services.AddEndpointsApiExplorer();
@@ -202,6 +222,7 @@ app.MapDiscoveredEndpoints(
     typeof(OprAssemblyMarker).Assembly,
     typeof(StdAssemblyMarker).Assembly,
     typeof(TchAssemblyMarker).Assembly,
+    typeof(AcdAssemblyMarker).Assembly,
     typeof(Program).Assembly);
 
 app.Run();

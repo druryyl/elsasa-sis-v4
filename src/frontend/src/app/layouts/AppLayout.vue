@@ -4,9 +4,13 @@ import { useRoute, useRouter } from 'vue-router';
 import { useQueryClient } from '@tanstack/vue-query';
 import {
   AlertTriangle,
+  BookOpen,
   BookOpenCheck,
+  CalendarClock,
   CalendarDays,
   ChevronDown,
+  ClipboardCheck,
+  FileSpreadsheet,
   GraduationCap,
   LogOut,
   Megaphone,
@@ -180,6 +184,38 @@ const navGroups: NavGroup[] = [
           'Permissions.Teaching.Assignments.Oversight',
           'Permissions.Teaching.Directory.Manage'
         ]
+      },
+      {
+        label: 'Classroom Attendance',
+        to: { name: 'academic.attendance' },
+        icon: ClipboardCheck,
+        permissions: [
+          'Permissions.Academic.Attendance.View',
+          'Permissions.Academic.Attendance.Record'
+        ]
+      },
+      {
+        label: 'Teacher Scorebook',
+        to: { name: 'academic.scorebook' },
+        icon: FileSpreadsheet,
+        permissions: [
+          'Permissions.Academic.Scorebook.View',
+          'Permissions.Academic.Scorebook.Manage'
+        ]
+      }
+    ]
+  },
+  {
+    group: 'Academic & Curriculum',
+    items: [
+      {
+        label: 'Curriculum & Learning Structure',
+        to: { name: 'academic.curriculum' },
+        icon: BookOpen,
+        permissions: [
+          'Permissions.Academic.Curriculum.View',
+          'Permissions.Academic.Curriculum.Manage'
+        ]
       }
     ]
   },
@@ -193,6 +229,16 @@ const navGroups: NavGroup[] = [
         permissions: [
           'Permissions.Operations.Calendar.View',
           'Permissions.Operations.Calendar.Manage'
+        ]
+      },
+      {
+        label: 'Timetables & Scheduling',
+        to: { name: 'operations.timetables' },
+        icon: CalendarClock,
+        permissions: [
+          'Permissions.Operations.Timetables.View',
+          'Permissions.Operations.Timetables.Manage',
+          'Permissions.Operations.Timetables.ViewOwn'
         ]
       },
       {

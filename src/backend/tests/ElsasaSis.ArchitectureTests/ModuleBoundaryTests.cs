@@ -13,6 +13,7 @@ public sealed class ModuleBoundaryTests
             "ElsasaSis.Modules.Opr",
             "ElsasaSis.Modules.Std",
             "ElsasaSis.Modules.Tch",
+            "ElsasaSis.Modules.Acd",
             "ElsasaSis.Api",
             "ElsasaSis.Database");
     }
@@ -25,6 +26,7 @@ public sealed class ModuleBoundaryTests
             "ElsasaSis.Modules.Auth",
             "ElsasaSis.Modules.Std",
             "ElsasaSis.Modules.Tch",
+            "ElsasaSis.Modules.Acd",
             "ElsasaSis.Api",
             "ElsasaSis.Database");
     }
@@ -37,6 +39,7 @@ public sealed class ModuleBoundaryTests
             "ElsasaSis.Modules.Auth",
             "ElsasaSis.Modules.Opr",
             "ElsasaSis.Modules.Tch",
+            "ElsasaSis.Modules.Acd",
             "ElsasaSis.Api",
             "ElsasaSis.Database");
     }
@@ -49,6 +52,20 @@ public sealed class ModuleBoundaryTests
             "ElsasaSis.Modules.Auth",
             "ElsasaSis.Modules.Opr",
             "ElsasaSis.Modules.Std",
+            "ElsasaSis.Modules.Acd",
+            "ElsasaSis.Api",
+            "ElsasaSis.Database");
+    }
+
+    [Fact]
+    public void AcdModule_ShouldNotDependOn_OtherModules_Api_Or_Database()
+    {
+        AssertModuleIsolation(
+            AssemblyArchitectureContext.AcdModuleAssembly,
+            "ElsasaSis.Modules.Auth",
+            "ElsasaSis.Modules.Opr",
+            "ElsasaSis.Modules.Std",
+            "ElsasaSis.Modules.Tch",
             "ElsasaSis.Api",
             "ElsasaSis.Database");
     }
@@ -80,6 +97,7 @@ public sealed class ModuleBoundaryTests
                 "ElsasaSis.Modules.Opr",
                 "ElsasaSis.Modules.Std",
                 "ElsasaSis.Modules.Tch",
+                "ElsasaSis.Modules.Acd",
                 "ElsasaSis.Api",
                 "ElsasaSis.Database");
         }

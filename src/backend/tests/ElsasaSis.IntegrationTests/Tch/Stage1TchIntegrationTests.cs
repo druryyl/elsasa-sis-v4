@@ -1,7 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using Dapper;
-using ElsasaSis.Api.Features.Academic.GetSubjects;
+using ElsasaSis.Modules.Acd.Features.LearningStructure.GetSubjects;
 using ElsasaSis.Database;
 using ElsasaSis.IntegrationTests.Fixtures;
 using ElsasaSis.Modules.Tch.Features.Assignments;

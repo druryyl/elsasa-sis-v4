@@ -6,11 +6,21 @@ export type AcademicYearLookupItem = components['schemas']['AcademicYearDto'];
 export type SubjectLookupItem = components['schemas']['SubjectResponse'];
 export type TeacherLookupItem = components['schemas']['TeacherDto'];
 export type StudyGroupLookupItem = components['schemas']['StudyGroupListItemDto'];
+export type RoomLookupItem = components['schemas']['RoomDto'];
 
 export interface AcademicYearsLookupParams {
   page?: number;
   pageSize?: number;
   search?: string;
+  sortField?: string;
+  sortOrder?: string;
+}
+
+export interface RoomsLookupParams {
+  roomType?: string;
+  search?: string;
+  page?: number;
+  pageSize?: number;
   sortField?: string;
   sortOrder?: string;
 }
@@ -43,7 +53,9 @@ export const lookupKeys = {
   activeTeachers: (params?: ActiveTeachersLookupParams) =>
     [...lookupKeys.all, 'active-teachers', params ?? {}] as const,
   studyGroups: (params?: StudyGroupsLookupParams) =>
-    [...lookupKeys.all, 'study-groups', params ?? {}] as const
+    [...lookupKeys.all, 'study-groups', params ?? {}] as const,
+  rooms: (params?: RoomsLookupParams) =>
+    [...lookupKeys.all, 'rooms', params ?? {}] as const
 };
 
 export async function fetchAcademicYearsLookup(
@@ -104,11 +116,29 @@ export async function fetchStudyGroupsLookup(
   return response?.items ?? [];
 }
 
+export async function fetchRoomsLookup(
+  params?: RoomsLookupParams
+): Promise<RoomLookupItem[]> {
+  const response = (await apiClient.get('/opr/rooms', {
+    params: {
+      RoomType: params?.roomType,
+      Search: params?.search?.trim() || undefined,
+      Page: params?.page ?? 1,
+      PageSize: params?.pageSize ?? 100,
+      SortField: params?.sortField ?? 'Name',
+      SortOrder: params?.sortOrder ?? 'asc'
+    }
+  })) as unknown as components['schemas']['RoomDtoPaginatedResponse'];
+
+  return response?.items ?? [];
+}
+
 export const lookupsApi = {
   fetchAcademicYearsLookup,
   fetchSubjectsLookup,
   fetchActiveTeachersLookup,
-  fetchStudyGroupsLookup
+  fetchStudyGroupsLookup,
+  fetchRoomsLookup
 };
 
 export const academicYearsLookupQuery = (params?: AcademicYearsLookupParams) =>
@@ -137,4 +167,11 @@ export const studyGroupsLookupQuery = (params?: StudyGroupsLookupParams) =>
     queryKey: lookupKeys.studyGroups(params),
     queryFn: () => fetchStudyGroupsLookup(params),
     staleTime: 2 * 60 * 1000
+  });
+
+export const roomsLookupQuery = (params?: RoomsLookupParams) =>
+  queryOptions({
+    queryKey: lookupKeys.rooms(params),
+    queryFn: () => fetchRoomsLookup(params),
+    staleTime: 5 * 60 * 1000
   });
